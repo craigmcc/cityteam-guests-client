@@ -2,11 +2,19 @@ import React, { createContext, useEffect, useState } from "react";
 
 import * as FacilityClient from "../clients/FacilityClient";
 
-// Provider for FacilityContext that contains context variables related to
-// available (active) facilities and the currently selected one (if any):
-//   facilities - Array of available active facilities [ [] ]
-//   selectedFacility - Currently selected facility, or none indicator
-//     [ { id: -1, name: "UNSELECTED" } ]
+// FacilityContext -----------------------------------------------------------
+
+// A context (and associated provider) managing the list of Facilities
+// that are active and available for the current user to choose.
+
+// TODO - enforce authorization when user access is implemented
+
+// Context Properties --------------------------------------------------------
+
+// facilities               List of Facilities available to be selected
+// selectedFacility         Currently selected Facility
+
+// Component Details ---------------------------------------------------------
 
 export const FacilityContext = createContext({
     facilities : [],
@@ -17,9 +25,7 @@ export const FacilityContext = createContext({
 export const FacilityContextProvider = (props) => {
 
     const [facilities, setFacilities] =
-        useState([
-            { id: -1, name: "Unknown" }
-        ]);
+        useState([{ id: -1, name: "Unknown" }]);
     const [selectedFacility, setSelectedFacility] =
         useState({ id: -1, name: "Unknown" });
 
@@ -32,11 +38,13 @@ export const FacilityContextProvider = (props) => {
                     console.log("FacilityContext.fetchData.available(" +
                         JSON.stringify(response.data, ["id", "name"]) + ")");
                     setFacilities(response.data);
-                    for (let facility of response.data) {
-                        if (name === facility.name) {
-                            console.log("FacilityContext.fetchData.selected(" +
-                                JSON.stringify(facility, ["id", "name"]) + ")");
-                            setSelectedFacility(facility);
+                    if (selectedFacility.id <= 0) {
+                        for (let facility of response.data) {
+                            if (name === facility.name) {
+                                console.log("FacilityContext.fetchData.selected(" +
+                                    JSON.stringify(facility, ["id", "name"]) + ")");
+                                setSelectedFacility(facility);
+                            }
                         }
                     }
                 })
@@ -44,8 +52,9 @@ export const FacilityContextProvider = (props) => {
 
         fetchData("Portland");
 
-    }, []);
+    }, [selectedFacility.id]);
 
+/*
     // Can define methods to be included in context as well
     const deassignSelectedFacility = () => {
         setSelectedFacility({ id: -1, name: "DESELECTED" });
@@ -66,15 +75,13 @@ export const FacilityContextProvider = (props) => {
                 }
             })
     }
+*/
 
     // Create the context object
     const facilityContext = {
         // Data values and corresponding setters
         facilities, setFacilities,
         selectedFacility, setSelectedFacility,
-        // Exported functions
-        deassignSelectedFacility,
-        refreshFacilities
     };
 
     // Return it, rendering children inside

@@ -1,32 +1,41 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 
 import { FacilityContext } from "../contexts/FacilityContext";
+import SelectElement from "../library/SelectElement";
 
 // FacilitySelector ----------------------------------------------------------
 
-// Render a select list of the active Facilities that the current user
+// Render a select list of the Facilities that the current user
 // is authorized to deal with.
-
-// TODO - Remodel to use SelectElement
 
 // Incoming Properties -------------------------------------------------------
 
-// props.handleSelect Handle (facility) that was just selected [No handler]
-// props.labelClassName CSS styles for label [default for text]
+// elementClassName         CSS styles for overall <Row> [not rendered]
+// fieldClassName           CSS styles for field <Col> [not rendered]
+// handleSelect             Handle (facility) when selected [no handler]
+// labelClassName           CSS styles for label <Col> [not rendered]
+
+// Component Details ---------------------------------------------------------
+
 export const FacilitySelector = (props) => {
 
     const facilityContext = useContext(FacilityContext);
-    const [labelClassName] =
-        useState(props.labelClassName
-            ? "mr-3 " + props.labelClassName
-            : "mr-3");
+
+    const calculateOptions = () => {
+        let options = [];
+        facilityContext.facilities.forEach(facility => {
+            options.push({ value: facility.id, description: facility.name})
+        })
+        return options;
+    }
 
     const onChange = (event) => {
         let newId = Number(event.target.value);
         for (let facility of facilityContext.facilities) {
             if (facility.id === newId) {
-                console.log("FacilitySelector.onChange(" +
-                    JSON.stringify(facility, ["id", "name"]) + ")");
+                console.info("FacilitySelector.onChange("
+                    + JSON.stringify(facility, ["id", "name"])
+                    + ")");
                 facilityContext.setSelectedFacility(facility);
                 if (props.handleSelect) {
                     props.handleSelect(facility);
@@ -38,6 +47,18 @@ export const FacilitySelector = (props) => {
 
     return (
 
+        <SelectElement
+          elementClassName={props.elementClassName ? props.elementClassName : null}
+          fieldClassName={props.fieldClassName ? props.fieldClassName : null}
+          fieldName="selectedFacility"
+          fieldValue={facilityContext.selectedFacility.id}
+          label="Current Facility:"
+          labelClassName={props.labelClassName ? props.labelClassName : null}
+          onChange={onChange}
+          options={calculateOptions()}
+        />
+
+/*
             <div className="form-row">
 
                 <div className="row form-group">
@@ -68,6 +89,7 @@ export const FacilitySelector = (props) => {
                 </div>
 
             </div>
+*/
 
     );
 
