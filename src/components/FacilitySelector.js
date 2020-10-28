@@ -2,6 +2,15 @@ import React, { useContext, useState } from "react";
 
 import { FacilityContext } from "../contexts/FacilityContext";
 
+// FacilitySelector ----------------------------------------------------------
+
+// Render a select list of the active Facilities that the current user
+// is authorized to deal with.
+
+// TODO - Remodel to use SelectElement
+
+// Incoming Properties -------------------------------------------------------
+
 // props.handleSelect Handle (facility) that was just selected [No handler]
 // props.labelClassName CSS styles for label [default for text]
 export const FacilitySelector = (props) => {

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Container from "react-bootstrap/Container";
 
 // GuestView -----------------------------------------------------------------
@@ -9,15 +9,11 @@ import Container from "react-bootstrap/Container";
 
 const GuestView = () => {
 
-    useEffect(() => {
-        console.info("GuestView.useEffect()");
-    });
-
     return (
 
         <>
 
-            <Container fluid>
+            <Container fluid id="GuestView">
 
                 <div>
                     This is GuestView.

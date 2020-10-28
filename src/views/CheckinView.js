@@ -1,22 +1,22 @@
 import React from "react";
 import Container from "react-bootstrap/Container";
 
-// HomeView ------------------------------------------------------------------
+// CheckinView ---------------------------------------------------------------
 
-// Top-level view for entering the application.
+// Top-level view for checking in overnight guests.
 
 // Component Details ---------------------------------------------------------
 
-const HomeView = () => {
+const CheckinView = () => {
 
     return (
 
         <>
 
-            <Container fluid id="HomeView">
+            <Container fluid id="CheckinView">
 
                 <div>
-                    This is a HomeView.
+                    This is the CheckinView.
                 </div>
 
             </Container>
@@ -26,4 +26,4 @@ const HomeView = () => {
 
 }
 
-export default HomeView;
+export default CheckinView;

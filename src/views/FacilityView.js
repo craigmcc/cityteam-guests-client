@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Container from "react-bootstrap/Container";
 
 // FacilityView --------------------------------------------------------------
@@ -9,15 +9,11 @@ import Container from "react-bootstrap/Container";
 
 const FacilityView = () => {
 
-    useEffect(() => {
-        console.info("FacilityView.useEffect()");
-    });
-
     return (
 
         <>
 
-            <Container fluid>
+            <Container fluid id="FacilityView">
 
                 <div>
                     This is FacilityView.

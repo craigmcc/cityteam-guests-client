@@ -1,6 +1,10 @@
-// IMPLEMENTATION NOTE:  The "options" we are parsing come from code inside
-// this application, not from external clients (like the server side deals with),
-// so we do not need to sanitize for malicious input.
+// queryParameters() ---------------------------------------------------------
+
+// Parse the options passed in and assemble them into the query string portion
+// of an outbound URI.  If a key has a "" value, it will be listed by itself,
+// otherwise key=value will be rendered.
+
+// WARNING:  No URI encoding is done here.
 
 const queryParameters = (options) => {
 

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Container from "react-bootstrap/Container";
 
 // TemplateView --------------------------------------------------------------
@@ -9,15 +9,11 @@ import Container from "react-bootstrap/Container";
 
 const TemplateView = () => {
 
-    useEffect(() => {
-        console.info("TemplateView.useEffect()");
-    });
-
     return (
 
         <>
 
-            <Container fluid>
+            <Container fluid id="TemplateView">
 
                 <div>
                     This is TemplateView.
