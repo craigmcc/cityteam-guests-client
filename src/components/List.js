@@ -61,38 +61,43 @@ import Table from "react-bootstrap/Table";
 
 const List = (props) => {
 
+// TODO - dynamic component selection not passing props at compile time?
+    /*
     const [HeadersGenerator] =
-        useState(props.headersGenerator || DefaultHeadersGenerator);
+        useState(props.headersGenerator ? props.headersGenerator : DefaultHeadersGenerator);
     const [TdGenerator] =
-        useState(props.tdGenerator || DefaultTdGenerator);
+        useState(props.tdGenerator ? props.tdGenerator : DefaultTdGenerator);
     const [TitleGenerator] =
-        useState(props.titleGenerator || DefaultTitleGenerator);
+        useState(props.titleGenerator ? props.titleGenerator : DefaultTitleGenerator);
     const [TrGenerator] =
-        useState(props.trGenerator || DefaultTrGenerator);
+        useState(props.trGenerator ? props.tdGenerator: DefaultTrGenerator);
+*/
 
     return (
 
         <Table
-            bordered={props.bordered || null}
-            hover={props.hover || false}
-            size={props.size || "sm"}
-            variant={props.variant || null}
+            bordered={props.bordered ? props.bordered : null}
+            hover={props.hover ? props.hover : null}
+            size={props.size ? props.size : "sm"}
+            variant={props.variant ? props.variant : null}
         >
 
             {/* <thead> section */}
             {props.headers || props.title ? (
                 <thead>
                 {props.title ? (
-                    <TitleGenerator
-                        headers={props.headers || null}
+                    <DefaultTitleGenerator
+                        headers={props.headers ? props.headers : null}
+                        keyBase={20000}
                         title={props.title}
-                        titleClassName={props.titleClassName || null}
+                        titleClassName={props.titleClassName ? props.titleClassName : null}
                     />
                 ) : null }
                 { props.headers ? (
-                    <HeadersGenerator
+                    <DefaultHeadersGenerator
                         headers={props.headers}
-                        headersClassName={props.headersClassName || null}
+                        headersClassName={props.headersClassName ? props.headersClassName : null}
+                        keyBase={40000}
                     />
                 ) : null }
                 </thead>
@@ -102,12 +107,15 @@ const List = (props) => {
             {props.items ? (
                 <tbody>
                 {props.items.map((item, rowIndex) => (
-                    <TrGenerator
-                        handleIndex={props.handleIndex || null}
+                    <>
+                    <DefaultTrGenerator
+                        fields={props.fields}
+                        handleIndex={props.handleIndex ? props.handleIndex : null}
                         item={item}
-                        matchIndex={props.index || -1}
+                        matchIndex={props.index ? props.index : -1}
                         rowIndex={rowIndex}
                     />
+                    </>
                 ))}
                 </tbody>
             ) : null }
@@ -116,7 +124,11 @@ const List = (props) => {
             {/* <tfoot> section */}
             {props.headers && props.footer ? (
                 <tfoot>
-                    <HeadersGenerator headers={props.headers}/>
+                    <DefaultHeadersGenerator
+                        headers={props.headers}
+                        headersClassName={props.headersClassName ? props.headersClassName : null}
+                        keyBase={50000}
+                    />
                 </tfoot>
             ) : null }
 
@@ -144,11 +156,12 @@ export const DefaultHeadersGenerator = (props) => {
 
     return (
         <tr
-            className={ props.headersClassName || "table-secondary"}
+            className={ props.headersClassName ? props.headersClassName : "table-secondary"}
+            key={props.keyBase ? props.keyBase : 30000}
         >
             {props.headers.map((header, index) => (
                 <th
-                    key={-index}
+                    key={props.keyBase ? props.keyBase + index + 1 : 30000 + index + 1}
                     scope="col"
                 >
                     {header}
@@ -169,6 +182,7 @@ export const DefaultHeadersGenerator = (props) => {
 // Incoming Properties -------------------------------------------------------
 
 // colIndex                 Zero-relative index of this column
+// rowIndex                 Zero-relative index of this row (for calculating key)
 // name                     Field name for the value being rendered
 // value                    Field value that is to be rendered in <td>...</td>
 
@@ -176,8 +190,8 @@ export const DefaultHeadersGenerator = (props) => {
 
 export const DefaultTdGenerator = (props) => {
 
-    const [ tdBooleanFalse ] = useState(props.booleanFalse || "No");
-    const [ tdBooleanTrue ] = useState(props.booleanTrue || "Yes");
+    const [ tdBooleanFalse ] = useState(props.booleanFalse ? props.booleanFalse : "No");
+    const [ tdBooleanTrue ] = useState(props.booleanTrue ? props.booleanTrue : "Yes");
 
     let renderField = (field) => {
         if (typeof(field) === "boolean") {
@@ -190,9 +204,10 @@ export const DefaultTdGenerator = (props) => {
     return (
 
         <td
-            key={200 + props.colIndex}
+            key={20000 + (props.rowIndex * 100) + props.colIndex}
         >
-            {renderField(props.field)}
+            {/*{renderField(props.field)}*/}
+            field = {props.field}
         </td>
 
     )
@@ -217,11 +232,12 @@ export const DefaultTitleGenerator = (props) => {
 
     return (
         <tr
-            className={props.titleClassName || "table-dark"}
+            className={props.titleClassName ? props.titleClassName : "table-dark"}
         >
             <th
                 className="text-center"
-                colSpan={props.headers.len || 1}
+                colSpan={props.headers ? props.headers.length : 1}
+                key={props.keyBase ? props.keyBase : 50000}
             >
                 {props.title}
             </th>
@@ -238,6 +254,7 @@ export const DefaultTitleGenerator = (props) => {
 
 // Incoming Properties --------------------------------------------------------
 
+// fields                   Names of the fields we will be rendering
 // handleIndex              Handle (index) for newly selected row [no handler]
 // item                     Item whose fields are to be handed to tdGenerator
 // matchIndex               Zero-relative index for row to highlight, or -1
@@ -247,11 +264,13 @@ export const DefaultTitleGenerator = (props) => {
 
 export const DefaultTrGenerator = (props) => {
 
+    let key = 10000 + props.rowIndex;
+
     return (
         <tr
             className={"table-" +
                 (props.rowIndex === props.matchIndex ? "primary" : "default")}
-            key={100 + props.rowIndex}
+            key={key}
             onClick={() => {
                 if (props.handleIndex) {
                     props.handleIndex(props.rowIndex)
@@ -259,9 +278,10 @@ export const DefaultTrGenerator = (props) => {
             }}
         >
             {props.fields.map((field, colIndex) => (
-                <TdGenerator
+                <DefaultTdGenerator
                     colIndex={colIndex}
                     name={field}
+                    rowIndex={props.rowIndex}
                     value={props.item[field]}
                 />
             ))}
