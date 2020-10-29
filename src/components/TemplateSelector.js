@@ -18,10 +18,10 @@ import { reportError } from "../util/error.handling";
 // elementClassName         CSS styles for the entire <Row> [col-12]
 // fieldClassName           CSS styles for the select <Col> [col-8]
 // fieldName                ID and name for this select [select]
+// handleTemplate           Handle (template) when action button is pressed [no handler]
 // label                    Label text [no label]
 // labelClassName           CSS styles for the label <Col> [col-2]
 // onChange                 Handle (event) when select option changes [no handler]
-// onClick                  Handle (template) when action button is pressed [no handler]
 
 // Component Details ---------------------------------------------------------
 
@@ -53,8 +53,8 @@ export const TemplateSelector = (props) => {
         console.info("TemplateSelector.onChange("
             + JSON.stringify(newTemplate, ["id", "name"])
             + ")");
-        if (props.onChange) {
-            props.onChange(newTemplate);
+        if (props.handleTemplate) {
+            props.handleTemplate(newTemplate);
         }
         setIndex(newIndex)
     }

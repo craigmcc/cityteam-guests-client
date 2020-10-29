@@ -12,7 +12,7 @@ import SelectElement from "../library/SelectElement";
 
 // elementClassName         CSS styles for overall <Row> [not rendered]
 // fieldClassName           CSS styles for field <Col> [not rendered]
-// handleSelect             Handle (facility) when selected [no handler]
+// handleFacility           Handle (facility) when selected [no handler]
 // labelClassName           CSS styles for label <Col> [not rendered]
 
 // Component Details ---------------------------------------------------------
@@ -37,8 +37,8 @@ export const FacilitySelector = (props) => {
                     + JSON.stringify(facility, ["id", "name"])
                     + ")");
                 facilityContext.setSelectedFacility(facility);
-                if (props.handleSelect) {
-                    props.handleSelect(facility);
+                if (props.handleFacility) {
+                    props.handleFacility(facility);
                 }
                 break;
             }
