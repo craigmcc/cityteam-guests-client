@@ -54,29 +54,6 @@ export const FacilityContextProvider = (props) => {
 
     }, [selectedFacility.id]);
 
-/*
-    // Can define methods to be included in context as well
-    const deassignSelectedFacility = () => {
-        setSelectedFacility({ id: -1, name: "DESELECTED" });
-    }
-
-    const refreshFacilities = () => {
-        FacilityClient.active()
-            .then(response => {
-                console.log("FacilityContext.refreshFacilities(" +
-                    JSON.stringify(response.data, ["id", "name"]) + ")");
-                setFacilities(response.data);
-                for (let facility of response.data) {
-                    if (selectedFacility.name === facility.name) {
-                        console.log("FacilityContext.refreshSelectedFacility(" +
-                            JSON.stringify(facility, ["id", "name"]) + ")");
-                        setSelectedFacility(facility);
-                    }
-                }
-            })
-    }
-*/
-
     // Create the context object
     const facilityContext = {
         // Data values and corresponding setters
