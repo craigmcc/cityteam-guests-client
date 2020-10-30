@@ -11,6 +11,8 @@ import * as Dates from "./Dates";
 // monthToObject (String -> Date) accept and return strings
 // in YYYY-MM format for months, and in YYYY-MM-DD format for dates.
 
+// NOTE:  No validations are done here, use Validations.validateMonth() as needed
+
 // Month Functions -----------------------------------------------------------
 
 // Return the specified month minus decrement days

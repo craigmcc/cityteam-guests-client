@@ -1,6 +1,6 @@
 import React from "react";
 
-import TextElement from "../library/TextElement";
+import TextElement from "../library/components/TextElement";
 
 // SearchBar -----------------------------------------------------------------
 

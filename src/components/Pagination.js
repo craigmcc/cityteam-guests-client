@@ -1,6 +1,6 @@
 import React from "react";
 
-import ActionButton from "../library/ActionButton";
+import ActionButton from "../library/components/ActionButton";
 
 // Pagination ----------------------------------------------------------------
 

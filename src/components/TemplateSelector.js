@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 
 import FacilityClient from "../clients/FacilityClient";
 import { FacilityContext } from "../contexts/FacilityContext";
-import SelectElement from "../library/SelectElement";
+import SelectElement from "../library/components/SelectElement";
 import { reportError } from "../util/error.handling";
 
 // TemplateSelector ----------------------------------------------------------

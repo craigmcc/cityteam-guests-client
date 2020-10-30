@@ -9,7 +9,7 @@ import List from "../components/List";
 import SearchBar from "../components/SearchBar";
 import { FacilityContext } from "../contexts/FacilityContext";
 // import FacilityForm from "../forms/FacilityForm";
-import ActionButton from "../library/ActionButton";
+import ActionButton from "../library/components/ActionButton";
 import { reportError } from "../util/error.handling";
 
 // FacilityView --------------------------------------------------------------

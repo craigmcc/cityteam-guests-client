@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 import TextElement from "./TextElement";
-import * as Validations from "./Validations";
+import * as Validations from "../util/Validations";
 
 // MonthSelector -------------------------------------------------------------
 

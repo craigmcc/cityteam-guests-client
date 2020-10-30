@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 
 import { FacilityContext } from "../contexts/FacilityContext";
-import SelectElement from "../library/SelectElement";
+import SelectElement from "../library/components/SelectElement";
 
 // FacilitySelector ----------------------------------------------------------
 

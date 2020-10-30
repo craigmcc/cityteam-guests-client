@@ -8,6 +8,8 @@ import subDays from "date-fns/subDays";
 // dateToObject (String -> Date) accept and return strings
 // in YYYY-MM-DD format.
 
+// NOTE:  No validations are done here, use Validations.validateDate() as needed
+
 // Date Functions ------------------------------------------------------------
 
 // Return the specified date minus decrement days
