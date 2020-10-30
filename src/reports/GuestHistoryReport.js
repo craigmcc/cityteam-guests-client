@@ -5,8 +5,8 @@ import Row from "react-bootstrap/Row";
 
 import * as FacilityClient from "../clients/FacilityClient";
 import * as GuestClient from "../clients/GuestClient";
-import List from "../components/List";
-import SearchBar from "../components/SearchBar";
+import List from "../library/components/List";
+import SearchBar from "../library/components/SearchBar";
 import { FacilityContext } from "../contexts/FacilityContext";
 import Pagination from "../components/Pagination";
 import ActionButton from "../library/components/ActionButton";

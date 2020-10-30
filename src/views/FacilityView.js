@@ -5,8 +5,8 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 
 import * as FacilityClient from "../clients/FacilityClient";
-import List from "../components/List";
-import SearchBar from "../components/SearchBar";
+import List from "../library/components/List";
+import SearchBar from "../library/components/SearchBar";
 import { FacilityContext } from "../contexts/FacilityContext";
 // import FacilityForm from "../forms/FacilityForm";
 import ActionButton from "../library/components/ActionButton";
