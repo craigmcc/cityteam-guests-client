@@ -30,7 +30,7 @@ const FacilityView = () => {
 
     useEffect(() => {
         console.info("FacilityView.useEffect()");
-        retrieveAllItems();
+        retrieveAllFacilities();
     }, []);
 
 
@@ -43,12 +43,12 @@ const FacilityView = () => {
     const onSearchChange = (event) => {
         console.log("FacilityView.onSearchChange(" + event.target.value + ")");
         setSearchText(event.target.value);
-        retrieveItems(event.target.value);
+        retrieveFacilities(event.target.value);
     }
 
     const onSearchClick = (event) => {
         console.log("FacilityView.onSearchClick()");
-        retrieveItems(searchText);
+        retrieveFacilities(searchText);
     }
 
     const handleSelectedIndex = (newIndex) => {
@@ -68,10 +68,10 @@ const FacilityView = () => {
         }
     }
 
-    const retrieveAllItems = () => {
+    const retrieveAllFacilities = () => {
         FacilityClient.all()
             .then(response => {
-                console.info("FacilityView.retrieveAllItems("
+                console.info("FacilityView.retrieveAllFacilities("
                     + JSON.stringify(response.data, ["id", "name"])
                     + ")");
                 setFacilities(response.data);
@@ -79,30 +79,30 @@ const FacilityView = () => {
                 setSearchText("");
             })
             .catch(error => {
-                reportError("FacilityView.retrieveAllItems()", error);
+                reportError("FacilityView.retrieveAllFacilities()", error);
             });
         setIndex(-1);
     }
 
-    const retrieveItems = (newSearchText) => {
+    const retrieveFacilities = (newSearchText) => {
         if (newSearchText === "") {
-            retrieveAllItems();
+            retrieveAllFacilities();
         } else {
-            retrieveMatchingItems(newSearchText);
+            retrieveMatchingFacilities(newSearchText);
             setIndex(-1);
         }
     }
 
-    const retrieveMatchingItems = (newSearchText) => {
+    const retrieveMatchingFacilities = (newSearchText) => {
         FacilityClient.name(newSearchText)
             .then(response => {
-                console.info("FacilityView.retrieveMatchingItems("
+                console.info("FacilityView.retrieveMatchingFacilities("
                     + JSON.stringify(response.data, ["id", "name"])
                     + ")");
                 setFacilities(response.data);
             })
             .catch(error => {
-                reportError("FacilityView.retrieveMatchingItems()", error);
+                reportError("FacilityView.retrieveMatchingFacilities()", error);
             });
         setIndex(-1);
     }

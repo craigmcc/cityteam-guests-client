@@ -10,10 +10,14 @@ import SelectElement from "../library/SelectElement";
 
 // Incoming Properties -------------------------------------------------------
 
+// autoFocus                Should this field receive autoFocus? [false]
 // elementClassName         CSS styles for overall <Row> [not rendered]
-// fieldClassName           CSS styles for field <Col> [not rendered]
+// fieldClassName           CSS styles for field <Col> [col-8]
+// fieldName                ID and name for this select [selectedFacility]
 // handleFacility           Handle (facility) when selected [no handler]
-// labelClassName           CSS styles for label <Col> [not rendered]
+// label                    Label text [Current Facility:]
+// labelClassName           CSS styles for label <Col> [col-4]
+// options                  Array of (Facility) for available options [*REQUIRED*]
 
 // Component Details ---------------------------------------------------------
 
@@ -48,48 +52,16 @@ export const FacilitySelector = (props) => {
     return (
 
         <SelectElement
-          elementClassName={props.elementClassName ? props.elementClassName : null}
-          fieldClassName={props.fieldClassName ? props.fieldClassName : null}
-          fieldName="selectedFacility"
-          fieldValue={facilityContext.selectedFacility.id}
-          label="Current Facility:"
-          labelClassName={props.labelClassName ? props.labelClassName : null}
-          onChange={onChange}
-          options={calculateOptions()}
+            autoFocus={props.autoFocus ? props.autoFocus : null}
+            elementClassName={props.elementClassName ? props.elementClassName : null}
+            fieldClassName={props.fieldClassName ? props.fieldClassName : "col-8"}
+            fieldName={props.fieldName ? props.fieldName : "selectedFacility"}
+            fieldValue={facilityContext.selectedFacility.id}
+            label={props.label ? props.label : "Current Facility:"}
+            labelClassName={props.labelClassName ? props.labelClassName : "col-4"}
+            onChange={onChange}
+            options={calculateOptions()}
         />
-
-/*
-            <div className="form-row">
-
-                <div className="row form-group">
-
-                    <label
-                        className={labelClassName}
-                        htmlFor="currentFacility"
-                    >
-                        Current Facility:
-                    </label>
-
-                    <select
-                        id="currentFacility"
-                        name="currentFacility"
-                        onChange={onChange}
-                        value={facilityContext.selectedFacility.id}
-                    >
-                        {facilityContext.facilities.map(facility => (
-                            <option
-                                key={facility.id}
-                                value={facility.id}
-                            >
-                                {facility.name}
-                            </option>
-                        ))}
-                    </select>
-
-                </div>
-
-            </div>
-*/
 
     );
 
