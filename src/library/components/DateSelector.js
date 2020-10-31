@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
+import { detect as detectBrowser } from "detect-browser";
 import TextElement from "./TextElement";
 import * as Validations from "../util/Validations";
 
@@ -22,7 +23,7 @@ import * as Validations from "../util/Validations";
 // fieldDisabled            Mark input to this field as disabled [not disabled]
 // fieldName                ID and name for this input [selectedDate]
 // fieldValue               Initial field value [""]
-// handleDate               Handle valid (date) as text on change or click [no handler]
+// handleDate               Handle valid (date, valid) as text on change or click [no handler]
 // label                    Label text [no label]
 // labelClassName           CSS styles for label <Col> [col-2]
 // max                      Maximum acceptable value [no max]
@@ -36,13 +37,38 @@ const DateSelector = (props) => {
     const [fieldValue, setFieldValue] =
         useState(props.fieldValue ? props.fieldValue : "");
 
+    const [type, setType] = useState("text");
+
+    useEffect(() => {
+
+        // type="date" only works on some browsers, so fall back to type="text" elsewhere
+        const calculateType = () => {
+            let browser = detectBrowser();
+//            console.info("DateSelector.detectBrowser = ", browser);
+            let result;
+            switch (browser && browser.name) {
+                case "chrome":
+                    result = "month";
+                    break;
+                default:
+                    result = "text";
+            }
+            return result;
+        }
+
+        let newType = calculateType();
+        console.info("MonthSelector.useEffect(type=" + newType + ")");
+        setType(newType);
+
+    }, [])
+
     const alertMessage = (newFieldValue) => {
         let message = "Invalid date specifier, must be in format YYYY-MM-DD";
         if (props.max && (newFieldValue > props.max)) {
-            message += ", < " + props.max;
+            message += ", <= " + props.max;
         }
         if (props.min && (newFieldValue < props.min)) {
-            message += ", > " + props.min;
+            message += ", >= " + props.min;
         }
         if (props.required) {
             message += ", required";
@@ -76,7 +102,7 @@ const DateSelector = (props) => {
         setFieldValue(newFieldValue);
         if (newFieldValid) {
             if (props.handleDate && !props.action) {
-                props.handleDate(newFieldValue);
+                props.handleDate(newFieldValue, newFieldValid);
             }
         } else {
             alert(alertMessage(newFieldValue));
@@ -90,10 +116,17 @@ const DateSelector = (props) => {
             + ")");
         if (fieldValid) {
             if (props.handleDate) {
-                props.handleDate(fieldValue);
+                props.handleDate(fieldValue, fieldValid);
             }
         } else {
             alert(alertMessage(fieldValue));
+        }
+    }
+
+    const onKeyDown = (event) => {
+        if (event.key === "Enter") {
+            console.info("DateSelector.onKeyDown() --> onClick()");
+            onClick();
         }
     }
 
@@ -117,10 +150,11 @@ const DateSelector = (props) => {
             min={props.min ? props.min : null}
             onChange={onChange}
             onClick={onClick}
-            pattern={Validations.validateDatePattern}
-            placeholder={props.placeholder ? props.placeholder : "Enter YYYY-MM"}
+            onKeyDown={onKeyDown}
+//            pattern={Validations.validateDatePattern}
+            placeholder={props.placeholder ? props.placeholder : "Enter YYYY-MM-DD"}
             required={props.required ? props.required : null}
-            type="date"
+            type={type}
         />
 
     );

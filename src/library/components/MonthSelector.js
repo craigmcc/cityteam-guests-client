@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
+import { detect as detectBrowser } from "detect-browser";
 import TextElement from "./TextElement";
 import * as Validations from "../util/Validations";
 
@@ -22,7 +23,7 @@ import * as Validations from "../util/Validations";
 // fieldDisabled            Mark input to this field as disabled [not disabled]
 // fieldName                ID and name for this input [selectedMonth]
 // fieldValue               Initial field value [""]
-// handleMonth              Handle valid (month) as text on change or click [no handler]
+// handleMonth              Handle valid (month, valid) as text on change or click [no handler]
 // label                    Label text [no label]
 // labelClassName           CSS styles for label <Col> [col-2]
 // max                      Maximum acceptable value [no max]
@@ -35,14 +36,38 @@ const MonthSelector = (props) => {
     const [fieldValid, setFieldValid] = useState(true);
     const [fieldValue, setFieldValue] =
         useState(props.fieldValue ? props.fieldValue : "");
+    const [type, setType] = useState("text");
+
+    useEffect(() => {
+
+        // type="month" only works on some browsers, so fall back to type="text" elsewhere
+        const calculateType = () => {
+            let browser = detectBrowser();
+//            console.info("MonthSelector.detectBrowser = ", browser);
+            let result;
+            switch (browser && browser.name) {
+                case "chrome":
+                    result = "month";
+                    break;
+                default:
+                    result = "text";
+            }
+            return result;
+        }
+
+        let newType = calculateType();
+        console.info("MonthSelector.useEffect(type=" + newType + ")");
+        setType(newType);
+
+    }, [])
 
     const alertMessage = (newFieldValue) => {
         let message = "Invalid month specifier, must be in format YYYY-MM";
         if (props.max && (newFieldValue > props.max)) {
-            message += ", < " + props.max;
+            message += ", <= " + props.max;
         }
         if (props.min && (newFieldValue < props.min)) {
-            message += ", > " + props.min;
+            message += ", >= " + props.min;
         }
         if (props.required) {
             message += ", required";
@@ -52,21 +77,18 @@ const MonthSelector = (props) => {
 
     const onChange = (event) => {
         let newFieldValue = event.target.value;
-        let newFieldValid = Validations.validateDate(newFieldValue);
+        let newFieldValid = Validations.validateMonth(newFieldValue);
         if (newFieldValue === "") {
             if (props.required) {
                 newFieldValid = false;
             }
         } else {
             if (props.max && (newFieldValue > props.max)) {
-                newFieldValue = false;
+                newFieldValid = false;
             }
             if (props.min && (newFieldValue < props.min)) {
-                newFieldValue = false;
+                newFieldValid = false;
             }
-        }
-        if (props.required && (newFieldValue === "")) {
-            newFieldValid = false;
         }
         console.info("MonthSelector.onChange("
             + "value=" + newFieldValue
@@ -74,26 +96,29 @@ const MonthSelector = (props) => {
             + ")");
         setFieldValid(newFieldValid);
         setFieldValue(newFieldValue);
-        if (newFieldValid) {
-            if (props.handleMonth && !props.action) {
-                props.handleMonth(newFieldValue);
-            }
-        } else {
-            alert(alertMessage(newFieldValue));
+        if (props.handleMonth && !props.action) {
+            props.handleMonth(newFieldValue, newFieldValid);
         }
     }
 
-    const onClick = (event) => {
-        console.info("DateSelector.onClick("
+    const onClick = () => {
+        console.info("MonthSelector.onClick("
             + "value=" + fieldValue
             + ", valid=" + fieldValid
             + ")");
         if (fieldValid) {
-            if (props.handleDate) {
-                props.handleDate(fieldValue);
+            if (props.handleMonth) {
+                props.handleMonth(fieldValue, fieldValid);
             }
         } else {
             alert(alertMessage(fieldValue));
+        }
+    }
+
+    const onKeyDown = (event) => {
+        if (event.key === "Enter") {
+            console.info("MonthSelector.onKeyDown() --> onClick()");
+            onClick();
         }
     }
 
@@ -117,10 +142,11 @@ const MonthSelector = (props) => {
             min={props.min ? props.min : null}
             onChange={onChange}
             onClick={onClick}
+            onKeyDown={onKeyDown}
             pattern={Validations.validateMonthPattern}
-            placeholder={props.placeholder ? props.placeholder : "Enter YYYY-MM-DD"}
+            placeholder={props.placeholder ? props.placeholder : "Enter YYYY-MM"}
             required={props.required ? props.required : null}
-            type="month"
+            type={type}
         />
 
     );

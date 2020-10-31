@@ -166,7 +166,9 @@ const GuestHistoryReport = () => {
 
                         <Row className="mb-3">
                             <Col className="col-4">
-                                <strong>Guest History for {facilityContext.selectedFacility.name}</strong>
+                                <strong>Guest History for&nbsp;
+                                    {facilityContext.selectedFacility.name}
+                                </strong>
                             </Col>
                             <Col className="col-8">
                                 <SearchBar

@@ -25,7 +25,6 @@ export const validateMonth = (value) => {
     if (!validateMonthPattern.test(value)) {
         return false;
     }
-    // TODO - range check on each component
     return true;
 }
 
