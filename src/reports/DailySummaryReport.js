@@ -10,6 +10,7 @@ import DateSelector from "../library/components/DateSelector";
 import List from "../library/components/List";
 import * as Dates from "../library/util/Dates";
 import { reportError } from "../util/error.handling";
+import * as Replacers from "../util/Replacers";
 import * as ReportTotals from "../util/ReportTotals";
 import { withFlattenedObjects } from "../util/transformations";
 
@@ -87,8 +88,7 @@ const DailySummaryReport = () => {
             .then(response => {
                 let registrations = flattenedRegistrations(response.data);
                 console.info("DailySummaryReport.handleDetailsReport("
-                    + JSON.stringify(registrations,
-                        ["id", "registrationDate", "matNumberAndFeatures"])
+                    + JSON.stringify(registrations, Replacers.REGISTRATION)
                     + ")");
 //                setDetailsIndex(-1);
                 setDetailsItems(registrations);

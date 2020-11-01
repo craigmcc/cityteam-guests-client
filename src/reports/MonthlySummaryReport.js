@@ -11,6 +11,7 @@ import MonthSelector from "../library/components/MonthSelector";
 import * as Months from "../library/util/Months";
 import { reportError } from "../util/error.handling";
 import * as ReportTotals from "../util/ReportTotals";
+import * as Replacers from "../util/Replacers";
 import { withFlattenedObjects } from "../util/transformations";
 
 // MonthlySummaryReport ------------------------------------------------------
@@ -120,14 +121,13 @@ const MonthlySummaryReport = () => {
             FacilityClient.registrationDate(
                 facilityContext.selectedFacility.id,
                 summariesItems[newIndex].registrationDate,
-                   { withGuest: "" }
+               { withGuest: "" }
             )
                 .then(response => {
                     let registrations = flattenedRegistrations(response.data);
                     console.info("MonthlySummaryReport.handleSummariesIndex("
                         + newIndex
-                        + ", " + JSON.stringify(registrations,
-                            ["id", "registrationDate", "matNumberAndFeatures"])
+                        + ", " + JSON.stringify(registrations, Replacers.REGISTRATION)
                         + ")");
 //                    setDetailsIndex(-1);
                     setDetailsItems(registrations);
@@ -154,11 +154,13 @@ const MonthlySummaryReport = () => {
             setSelectedMonth(newMonth);
             let registrationDateFrom = Months.startDate(newMonth);
             let registrationDateTo = Months.endDate(newMonth);
-            FacilityClient.registrationSummary(facilityContext.selectedFacility.id,
-                registrationDateFrom, registrationDateTo)
+            FacilityClient.registrationSummary(
+                facilityContext.selectedFacility.id,
+                registrationDateFrom, registrationDateTo
+            )
                 .then(response => {
                     console.info("MonthlySummaryReport.handleSummariesReport("
-                        + JSON.stringify(response.data, ["facilityId", "registrationDate", "totalAssigned"])
+                        + JSON.stringify(response.data, Replacers.SUMMARY)
                         + ")"
                     );
                     response.data.forEach(summary => {
@@ -293,6 +295,7 @@ const MonthlySummaryReport = () => {
                                 fields={ReportTotals.summariesFields}
                                 headers={ReportTotals.summariesHeaders}
                                 items={[summariesTotals]}
+                                striped
                                 title={summariesTotalsTitle}
                             />
                         </Row>

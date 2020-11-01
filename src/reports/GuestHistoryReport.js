@@ -5,12 +5,13 @@ import Row from "react-bootstrap/Row";
 
 import * as FacilityClient from "../clients/FacilityClient";
 import * as GuestClient from "../clients/GuestClient";
-import List from "../library/components/List";
-import SearchBar from "../library/components/SearchBar";
 import { FacilityContext } from "../contexts/FacilityContext";
-import Pagination from "../components/Pagination";
 import ActionButton from "../library/components/ActionButton";
+import List from "../library/components/List";
+import Pagination from "../library/components/Pagination";
+import SearchBar from "../library/components/SearchBar";
 import { reportError } from "../util/error.handling";
+import * as Replacers from "../util/Replacers";
 
 
 // GuestHistoryReport --------------------------------------------------------
@@ -28,25 +29,27 @@ const GuestHistoryReport = () => {
     const [guests, setGuests] = useState([]);
     const [heading, setHeading] = useState("");
     const [index, setIndex] = useState(-1);
-    const [pageSize] = useState(30);
+    const [pageSize] = useState(10);
     const [registrations, setRegistrations] = useState([]);
     const [searchText, setSearchText] = useState("");
 
     useEffect(() => {
         console.info("GuestHistoryReport.useEffect()");
         retrieveAllGuests();
+        setIndex(-1);
+        setSearchText("")
     }, [facilityContext.selectedFacility]);
 
 
-    const handleSelectedIndex = (newIndex) => {
+    const handleIndex = (newIndex) => {
         if (newIndex === index) {
-            console.info("GuestHistoryReport.handleSelectedIndex(-1)");
+            console.info("GuestHistoryReport.handleIndex(-1)");
             setGuest(null);
             setIndex(-1);
         } else {
-            console.info("GuestHistoryReport.handleSelectedIndex("
+            console.info("GuestHistoryReport.handleIndex("
                 + newIndex + ", "
-                + JSON.stringify(guests[newIndex], ["id", "firstName", "lastName"])
+                + JSON.stringify(guests[newIndex], Replacers.GUEST)
                 + ")");
             retrieveRegistrations(guests[newIndex]);
             setHeading("Guest History for " +
@@ -64,22 +67,8 @@ const GuestHistoryReport = () => {
         setHeading("");
     }
 
-    const onPageNext = () => {
-        console.info("GuestHistoryReport.onPageNext()");
-        let newCurrentPage = currentPage + 1;
-        setCurrentPage(newCurrentPage);
-        retrieveGuests(searchText, newCurrentPage);
-    }
-
-    const onPagePrevious = () => {
-        console.info("GuestHistoryReport.onPagePrevious()");
-        let newCurrentPage = currentPage - 1;
-        setCurrentPage(newCurrentPage);
-        retrieveGuests(searchText, newCurrentPage);
-    }
-
-    const onSearchChange = (event) => {
-        console.info("GuestHistoryReport.onSearchChange("
+    const onChange = (event) => {
+        console.info("GuestHistoryReport.onChange("
             + event.target.value
             + ")");
         setCurrentPage(1);
@@ -87,11 +76,25 @@ const GuestHistoryReport = () => {
         retrieveGuests(event.target.value, currentPage);
     }
 
-    const onSearchClick = () => {
-        console.info("GuestHistoryReport.onSearchClick("
+    const onClick = () => {
+        console.info("GuestHistoryReport.onClick("
             + searchText
             + ")");
         retrieveGuests(searchText, currentPage);
+    }
+
+    const onNext = () => {
+        console.info("GuestHistoryReport.onNext()");
+        let newCurrentPage = currentPage + 1;
+        setCurrentPage(newCurrentPage);
+        retrieveGuests(searchText, newCurrentPage);
+    }
+
+    const onPrevious = () => {
+        console.info("GuestHistoryReport.onPrevious()");
+        let newCurrentPage = currentPage - 1;
+        setCurrentPage(newCurrentPage);
+        retrieveGuests(searchText, newCurrentPage);
     }
 
     const retrieveAllGuests = () => {
@@ -110,9 +113,9 @@ const GuestHistoryReport = () => {
 
     const retrieveMatchingGuests = (newSearchText, newCurrentPage) => {
         console.info("GuestHistoryReport.retrieveMatchingGuests for("
-            + JSON.stringify(facilityContext.selectedFacility,["id", "name"])
-            + ", " + newSearchText
-            + ", " + newCurrentPage
+            + JSON.stringify(facilityContext.selectedFacility,Replacers.FACILITY)
+            + ", searchText=" + newSearchText
+            + ", currentPage=" + newCurrentPage
             + ")");
         FacilityClient.guestName(facilityContext.selectedFacility.id, newSearchText,
                 {
@@ -121,19 +124,19 @@ const GuestHistoryReport = () => {
                 })
             .then(response => {
                 console.info("GuestHistoryReport.retrieveMatchingGuests got("
-                    + JSON.stringify(response.data,["id", "firstName", "lastName"])
+                    + JSON.stringify(response.data,Replacers.GUEST)
                     + ")");
                 setGuests(response.data);
+                setIndex(-1);
             })
             .catch(error => {
                 reportError("GuestHistoryReport.retrieveMatchingGuests()", error);
             });
-        setIndex(-1);
     }
 
     const retrieveRegistrations = (newGuest) => {
         console.info("GuestHistoryReport.retrieveRegistrations for("
-            + JSON.stringify(newGuest, ["id", "firstName", "lastName"])
+            + JSON.stringify(newGuest, Replacers.GUEST)
             + ")");
         GuestClient.registrationAll(newGuest.id)
             .then(response => {
@@ -144,8 +147,7 @@ const GuestHistoryReport = () => {
                     }
                 }
                 console.info("GuestHistoryReport.retrieveRegistrations got(" +
-                    JSON.stringify(response.data,
-                        ["id", "registrationDate", "matNumberAndFeatures"]));
+                    JSON.stringify(response.data, Replacers.REGISTRATION));
                 setRegistrations(response.data);
             })
             .catch(error => {
@@ -174,8 +176,8 @@ const GuestHistoryReport = () => {
                                 <SearchBar
                                     fieldName="searchByName"
                                     fieldValue={searchText}
-                                    onChange={onSearchChange}
-                                    onClick={onSearchClick}
+                                    onChange={onChange}
+                                    onClick={onClick}
                                     placeholder="Enter all or part of either name ..."
                                     //                                    withAction
                                     //                                    withClear
@@ -189,8 +191,8 @@ const GuestHistoryReport = () => {
                                     currentPage={currentPage}
                                     lastPage={(guests.length === 0) ||
                                         (guests.length < pageSize)}
-                                    onNext={onPageNext}
-                                    onPrevious={onPagePrevious}
+                                    onNext={onNext}
+                                    onPrevious={onPrevious}
                                 />
                             </Col>
                         </Row>
@@ -201,7 +203,7 @@ const GuestHistoryReport = () => {
                                 fields={["firstName", "lastName",
                                     "active", "comments"]}
                                 // footer
-                                handleIndex={handleSelectedIndex}
+                                handleIndex={handleIndex}
                                 headers={["First Name", "Last Name",
                                     "Active", "Comments About Guest"]}
                                 hover

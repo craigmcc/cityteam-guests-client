@@ -6,11 +6,12 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 
 import * as FacilityClient from "../clients/FacilityClient";
-import List from "../library/components/List";
 import { FacilityContext } from "../contexts/FacilityContext";
 // import TemplateForm from "../forms/TemplateForm";
 import ActionButton from "../library/components/ActionButton";
+import List from "../library/components/List";
 import { reportError } from "../util/error.handling";
+import * as Replacers from "../util/Replacers";
 
 // TemplateView --------------------------------------------------------------
 
@@ -41,7 +42,8 @@ const TemplateView = () => {
             setTemplate(null);
         } else {
             console.info("TemplateView.handleIndex("
-                + newIndex
+                + newIndex + ", "
+                + JSON.stringify(templates[newIndex], Replacers.TEMPLATE)
                 + ")");
             setIndex(newIndex);
             setShow(true);
@@ -51,7 +53,7 @@ const TemplateView = () => {
 
     const handleInsert = (template) => {
         console.info("TemplateView.handleInsert("
-            + JSON.stringify(template, ["id", "name"])
+            + JSON.stringify(template, Replacers.TEMPLATE)
             + ")");
         setShow(false);
         retrieveAllTemplates();
@@ -59,7 +61,7 @@ const TemplateView = () => {
 
     const handleRemove = (template) => {
         console.info("TemplateView.handleRemove("
-            + JSON.stringify(template, ["id", "name"])
+            + JSON.stringify(template, Replacers.TEMPLATE)
             + ")");
         setShow(false);
         retrieveAllTemplates();
@@ -67,7 +69,7 @@ const TemplateView = () => {
 
     const handleUpdate = (template) => {
         console.info("TemplateView.handleUpdate("
-            + JSON.stringify(template, ["id", "name"])
+            + JSON.stringify(template, Replacers.TEMPLATE)
             + ")");
         setShow(false);
         retrieveAllTemplates();
@@ -91,14 +93,14 @@ const TemplateView = () => {
             return;
         }
         console.info("TemplateView.retrieveAllTemplates for("
-            + JSON.stringify(facilityContext.selectedFacility, ["id", "name"])
+            + JSON.stringify(facilityContext.selectedFacility, Replacers.FACILITY)
             + ")");
         FacilityClient.templateAll(
             facilityContext.selectedFacility.id
         )
             .then(response => {
                 console.info("TemplateView.retrieveAllTemplates got("
-                    + JSON.stringify(response.data, ["id", "name"])
+                    + JSON.stringify(response.data, Replacers.TEMPLATE)
                     + ")");
                 setIndex(-1);
                 setTemplates(response.data);
@@ -143,6 +145,11 @@ const TemplateView = () => {
                         title={"All Templates for "
                                + facilityContext.selectedFacility.name}
                     />
+                </Row>
+
+                <Row className="mb-1 ml-1 mr-1">
+                    Click &nbsp;<strong>Add</strong>&nbsp; for a new Facility, or
+                    click on a row in the table to edit an existing one.
                 </Row>
 
             </Container>

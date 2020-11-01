@@ -5,18 +5,18 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 
 import * as FacilityClient from "../clients/FacilityClient";
-import List from "../library/components/List";
-import SearchBar from "../library/components/SearchBar";
 import { FacilityContext } from "../contexts/FacilityContext";
 // import GuestForm from "../forms/GuestForm";
 import ActionButton from "../library/components/ActionButton";
+import List from "../library/components/List";
+import Pagination from "../library/components/Pagination";
+import SearchBar from "../library/components/SearchBar";
 import { reportError } from "../util/error.handling";
+import * as Replacers from "../util/Replacers";
 
 // GuestView -----------------------------------------------------------------
 
 // Top-level view for administering Guests.
-
-// TODO - reset current page when appropriate
 
 // Component Details ---------------------------------------------------------
 
@@ -28,13 +28,15 @@ const GuestView = () => {
     const [index, setIndex] = useState(-1);
     const [guest, setGuest] = useState(null);
     const [guests, setGuests] = useState([]);
-    const [pageSize] = useState(15);
+    const [pageSize] = useState(10);
     const [searchText, setSearchText] = useState("");
     const [show, setShow] = useState(false);
 
     useEffect(() => {
-        console.info("TemplateView.useEffect()");
+        console.info("GuestView.useEffect()");
         retrieveAllGuests();
+        setIndex(-1);
+        setSearchText("")
         // eslint-disable-next-line
     }, [facilityContext.selectedFacility]);
 
@@ -46,7 +48,8 @@ const GuestView = () => {
             setGuest(null);
         } else {
             console.info("GuestView.handleIndex("
-                + newIndex
+                + newIndex + ", "
+                + JSON.stringify(guests[newIndex], Replacers.GUEST)
                 + ")");
             setIndex(newIndex);
             setShow(true);
@@ -56,7 +59,7 @@ const GuestView = () => {
 
     const handleInsert = (guest) => {
         console.info("GuestView.handleInsert("
-            + JSON.stringify(guest, ["id", "name"])
+            + JSON.stringify(guest, Replacers.GUEST)
             + ")");
         setShow(false);
         retrieveGuests(searchText);
@@ -64,7 +67,7 @@ const GuestView = () => {
 
     const handleRemove = (guest) => {
         console.info("GuestView.handleRemove("
-            + JSON.stringify(guest, ["id", "name"])
+            + JSON.stringify(guest, Replacers.GUEST)
             + ")");
         setShow(false);
         retrieveGuests(searchText);
@@ -72,7 +75,7 @@ const GuestView = () => {
 
     const handleUpdate = (guest) => {
         console.info("GuestView.handleUpdate("
-            + JSON.stringify(guest, ["id", "name"])
+            + JSON.stringify(guest, Replacers.GUEST)
             + ")");
         setShow(false);
         retrieveGuests(searchText);
@@ -91,24 +94,24 @@ const GuestView = () => {
     }
 
     const onClick = () => {
-        console.info("FacilityView.onClick()");
+        console.info("GuestView.onClick()");
         retrieveGuests(searchText, currentPage);
     }
 
     const onHide = () => {
-        console.info("FacilityView.onHide()");
+        console.info("GuestView.onHide()");
         setIndex(-1);
         setShow(false);
     }
 
-    const onPrevious = () => {
+    const onNext = () => {
         console.info("GuestView.onNext()");
         let newCurrentPage = currentPage + 1;
         setCurrentPage(newCurrentPage);
         retrieveGuests(searchText, newCurrentPage);
     }
 
-    const onNext = () => {
+    const onPrevious = () => {
         console.info("GuestView.onNext()");
         let newCurrentPage = currentPage + 1;
         setCurrentPage(newCurrentPage);
@@ -125,24 +128,34 @@ const GuestView = () => {
         if (newSearchText === "") {
             retrieveAllGuests();
         } else {
-            retrieveMatchingGuests(newSearchText);
+            retrieveMatchingGuests(newSearchText, newCurrentPage);
             setIndex(-1);
         }
     }
 
     const retrieveMatchingGuests = (newSearchText, newCurrentPage) => {
-        // TODO - pagination support
-        FacilityClient.name(newSearchText)
-            .then(response => {
-                console.info("GuestView.retrieveMatchingGuests("
-                    + JSON.stringify(response.data, ["id", "name"])
-                    + ")");
-                setGuests(response.data);
-                setIndex(-1);
+        console.info("GuestView.retrieveMatchingGuests for("
+            + JSON.stringify(facilityContext.selectedFacility.name, Replacers.FACILITY)
+            + ", searchText=" + newSearchText
+            + ", currentPage=" + newCurrentPage
+            + ")");
+        FacilityClient.guestName(
+            facilityContext.selectedFacility.id,
+            newSearchText,
+            {
+                limit: pageSize,
+                offset: (pageSize * (newCurrentPage - 1))
             })
-            .catch(error => {
-                reportError("FacilityView.retrieveMatchingFacilities()", error);
-            });
+                .then(response => {
+                    console.info("GuestView.retrieveMatchingGuests got("
+                        + JSON.stringify(response.data,Replacers.GUEST)
+                        + ")");
+                    setGuests(response.data);
+                    setIndex(-1);
+                })
+                .catch(error => {
+                    reportError("GuestView.retrieveMatchingGuests()", error);
+                });
     }
 
 
@@ -152,9 +165,61 @@ const GuestView = () => {
 
             <Container fluid id="GuestView">
 
-                <div>
-                    This is GuestView.
-                </div>
+                <Row className="mb-3">
+                    <Col className="col-4">
+                        <strong className="mr-3">
+                            Guests for {facilityContext.selectedFacility.name}
+                        </strong>
+                        <ActionButton
+                            label="Add"
+                            onClick={onAdd}
+                            variant="primary"
+                        />
+                    </Col>
+                    <Col className="col-8">
+                        <SearchBar
+                            fieldName="searchText"
+                            fieldValue={searchText}
+                            onChange={onChange}
+                            onClick={onClick}
+                            placeholder="Search by all or part of either name ..."
+                            // withAction
+                        />
+                    </Col>
+                </Row>
+
+                <Row className="mb-3">
+                    <Col>
+                        <Pagination
+                            currentPage={currentPage}
+                            lastPage={(guests.length === 0) ||
+                                (guests.length < pageSize)}
+                            onNext={onNext}
+                            onPrevious={onPrevious}
+                        />
+                    </Col>
+                </Row>
+
+                <Row className="ml-1 mr-1">
+                    <List
+                        bordered
+                        fields={["firstName", "lastName",
+                            "active", "comments"]}
+                        // footer
+                        handleIndex={handleIndex}
+                        headers={["First Name", "Last Name",
+                            "Active", "Comments About Guest"]}
+                        hover
+                        index={index}
+                        items={guests}
+                        striped
+                    />
+                </Row>
+
+                <Row className="mb-2 ml-1 mr-1">
+                    Click &nbsp;<strong>Add</strong>&nbsp; for a new Guest, or
+                    click on a row in the table to edit an existing one.
+                </Row>
 
             </Container>
         </>

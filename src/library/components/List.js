@@ -73,6 +73,16 @@ const List = (props) => {
         useState(props.trGenerator ? props.tdGenerator: DefaultTrGenerator);
 */
 
+    const [index, setIndex] = useState(props.index ? props.index : -1);
+
+    const handleIndex = (newIndex) => {
+//        console.info("List.handleIndex(" + newIndex + ")");
+        setIndex(newIndex);
+        if (props.handleIndex) {
+            props.handleIndex(newIndex);
+        }
+    }
+
     return (
 
         <Table
@@ -110,10 +120,10 @@ const List = (props) => {
                     <>
                     <DefaultTrGenerator
                         fields={props.fields}
-                        handleIndex={props.handleIndex ? props.handleIndex : null}
+                        handleIndex={handleIndex}
                         item={item}
                         keyBase={1000 + (rowIndex * 100)}
-                        matchIndex={props.index ? props.index : -1}
+                        matchIndex={index}
                         rowIndex={rowIndex}
                     />
                     </>

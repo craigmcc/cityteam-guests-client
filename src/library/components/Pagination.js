@@ -1,12 +1,12 @@
 import React from "react";
 
-import ActionButton from "../library/components/ActionButton";
+import ActionButton from "./ActionButton";
 
 // Pagination ----------------------------------------------------------------
 
 // Very simple pagination controls.
 
-// WARNING:  Likely to be modified a bunch, so not in the "library" directory.
+// WARNING:  Likely to be modified a bunch.
 
 // Incoming Properties -------------------------------------------------------
 
