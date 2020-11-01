@@ -23,7 +23,7 @@ import * as Validations from "../util/Validations";
 // fieldDisabled            Mark input to this field as disabled [not disabled]
 // fieldName                ID and name for this input [selectedMonth]
 // fieldValue               Initial field value [""]
-// handleMonth              Handle valid (month, valid) as text on change or click [no handler]
+// handleMonth              Handle valid (month) as text on change or click [no handler]
 // label                    Label text [no label]
 // labelClassName           CSS styles for label <Col> [col-2]
 // max                      Maximum acceptable value [no max]
@@ -96,8 +96,8 @@ const MonthSelector = (props) => {
             + ")");
         setFieldValid(newFieldValid);
         setFieldValue(newFieldValue);
-        if (props.handleMonth && !props.action) {
-            props.handleMonth(newFieldValue, newFieldValid);
+        if (props.handleMonth && !props.action && newFieldValid) {
+            props.handleMonth(newFieldValue);
         }
     }
 
@@ -108,7 +108,7 @@ const MonthSelector = (props) => {
             + ")");
         if (fieldValid) {
             if (props.handleMonth) {
-                props.handleMonth(fieldValue, fieldValid);
+                props.handleMonth(fieldValue);
             }
         } else {
             alert(alertMessage(fieldValue));
@@ -143,7 +143,7 @@ const MonthSelector = (props) => {
             onChange={onChange}
             onClick={onClick}
             onKeyDown={onKeyDown}
-            pattern={Validations.validateMonthPattern}
+            // pattern={Validations.validateMonthPattern}
             placeholder={props.placeholder ? props.placeholder : "Enter YYYY-MM"}
             required={props.required ? props.required : null}
             type={type}

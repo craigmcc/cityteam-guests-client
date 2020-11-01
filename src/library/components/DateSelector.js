@@ -23,7 +23,7 @@ import * as Validations from "../util/Validations";
 // fieldDisabled            Mark input to this field as disabled [not disabled]
 // fieldName                ID and name for this input [selectedDate]
 // fieldValue               Initial field value [""]
-// handleDate               Handle valid (date, valid) as text on change or click [no handler]
+// handleDate               Handle valid (date) as text on change or click [no handler]
 // label                    Label text [no label]
 // labelClassName           CSS styles for label <Col> [col-2]
 // max                      Maximum acceptable value [no max]
@@ -101,11 +101,9 @@ const DateSelector = (props) => {
         setFieldValid(newFieldValid);
         setFieldValue(newFieldValue);
         if (newFieldValid) {
-            if (props.handleDate && !props.action) {
-                props.handleDate(newFieldValue, newFieldValid);
+            if (props.handleDate && !props.action && newFieldValid) {
+                props.handleDate(newFieldValue);
             }
-        } else {
-            alert(alertMessage(newFieldValue));
         }
     }
 
@@ -116,7 +114,7 @@ const DateSelector = (props) => {
             + ")");
         if (fieldValid) {
             if (props.handleDate) {
-                props.handleDate(fieldValue, fieldValid);
+                props.handleDate(fieldValue);
             }
         } else {
             alert(alertMessage(fieldValue));
@@ -151,7 +149,7 @@ const DateSelector = (props) => {
             onChange={onChange}
             onClick={onClick}
             onKeyDown={onKeyDown}
-//            pattern={Validations.validateDatePattern}
+            // pattern={Validations.validateDatePattern}
             placeholder={props.placeholder ? props.placeholder : "Enter YYYY-MM-DD"}
             required={props.required ? props.required : null}
             type={type}

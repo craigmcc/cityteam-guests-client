@@ -71,14 +71,8 @@ const DailySummaryReport = () => {
         return flattenedItems;
     }
 
-    const handleDetailsReport = (newDate, newValid) => {
-        console.info("DailySummaryReport.handleDetailsReport("
-            + "date=" + newDate
-            + ", valid=" + newValid
-            + ")");
-        if (!newValid) {
-            return;
-        }
+    const handleDetailsReport = (newDate) => {
+        console.info("DailySummaryReport.handleDetailsReport(" + newDate + ")");
         setSelectedDate(newDate);
         FacilityClient.registrationDate(
             facilityContext.selectedFacility.id,

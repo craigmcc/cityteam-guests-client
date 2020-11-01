@@ -145,58 +145,51 @@ const MonthlySummaryReport = () => {
         }
     }
 
-    const handleSummariesReport = (newMonth, newValid) => {
-        console.info("MonthlySummaryReport.handleSummariesReport("
-            + "month=" + newMonth
-            + ", valid=" + newValid
-            + ")");
-        if (newValid) {
-            setSelectedMonth(newMonth);
-            let registrationDateFrom = Months.startDate(newMonth);
-            let registrationDateTo = Months.endDate(newMonth);
-            FacilityClient.registrationSummary(
-                facilityContext.selectedFacility.id,
-                registrationDateFrom, registrationDateTo
-            )
-                .then(response => {
-                    console.info("MonthlySummaryReport.handleSummariesReport("
-                        + JSON.stringify(response.data, Replacers.SUMMARY)
-                        + ")"
-                    );
-                    response.data.forEach(summary => {
-                        summary.totalMats = summary.totalAssigned + summary.totalUnassigned;
-                        if (summary.totalMats === 0) {
-                            summary.percentAssigned = "0.0%";
-                            summary.percentUnassigned = "0.0%";
-                        } else {
-                            summary.percentAssigned =
-                                "" + (summary.totalAssigned * 100 / summary.totalMats).toFixed(1) + "%";
-                            summary.percentUnassigned =
-                                "" + (summary.totalUnassigned * 100 / summary.totalMats).toFixed(1) + "%";
-                        }
-                        summary.totalAmount = "$" + parseFloat(summary.totalAmount).toFixed(2);
-                    })
-                    setSummariesIndex(-1);
+    const handleSummariesReport = (newMonth) => {
+        console.info("MonthlySummaryReport.handleSummariesReport(" + newMonth + ")");
+        setSelectedMonth(newMonth);
+        let registrationDateFrom = Months.startDate(newMonth);
+        let registrationDateTo = Months.endDate(newMonth);
+        FacilityClient.registrationSummary(
+            facilityContext.selectedFacility.id,
+            registrationDateFrom, registrationDateTo
+        )
+            .then(response => {
+                console.info("MonthlySummaryReport.handleSummariesReport("
+                    + JSON.stringify(response.data, Replacers.SUMMARY)
+                    + ")"
+                );
+                response.data.forEach(summary => {
+                    summary.totalMats = summary.totalAssigned + summary.totalUnassigned;
+                    if (summary.totalMats === 0) {
+                        summary.percentAssigned = "0.0%";
+                        summary.percentUnassigned = "0.0%";
+                    } else {
+                        summary.percentAssigned =
+                            "" + (summary.totalAssigned * 100 / summary.totalMats).toFixed(1) + "%";
+                        summary.percentUnassigned =
+                            "" + (summary.totalUnassigned * 100 / summary.totalMats).toFixed(1) + "%";
+                    }
+                    summary.totalAmount = "$" + parseFloat(summary.totalAmount).toFixed(2);
+                })
+                setSummariesIndex(-1);
 //                    setSummariesItem(null);
-                    setSummariesItems(response.data);
-                    setSummariesTitle("Monthly Summary for "
-                        + facilityContext.selectedFacility.name
-                        + " (" + registrationDateFrom
-                        + " - " + registrationDateTo + ")"
-                    )
-                    setSummariesTotals(ReportTotals.summariesTotals(response.data));
-                    setSummariesTotalsTitle("Monthly Totals for "
-                        + facilityContext.selectedFacility.name
-                        + " (" + registrationDateFrom
-                        + " - " + registrationDateTo + ")"
-                    )
-                })
-                .catch(error => {
-                    reportError("MonthlySummaryReport.handleReportSummaries()", error);
-                })
-        } else {
-            // Ignore any invalid selected month (being edited on fallback)
-        }
+                setSummariesItems(response.data);
+                setSummariesTitle("Monthly Summary for "
+                    + facilityContext.selectedFacility.name
+                    + " (" + registrationDateFrom
+                    + " - " + registrationDateTo + ")"
+                )
+                setSummariesTotals(ReportTotals.summariesTotals(response.data));
+                setSummariesTotalsTitle("Monthly Totals for "
+                    + facilityContext.selectedFacility.name
+                    + " (" + registrationDateFrom
+                    + " - " + registrationDateTo + ")"
+                )
+            })
+            .catch(error => {
+                reportError("MonthlySummaryReport.handleReportSummaries()", error);
+            })
     }
 
     const onBackDetails = () => {
