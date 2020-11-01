@@ -10,13 +10,12 @@ import List from "../library/components/List";
 import MonthSelector from "../library/components/MonthSelector";
 import * as Months from "../library/util/Months";
 import { reportError } from "../util/error.handling";
+import * as ReportTotals from "../util/ReportTotals";
 import { withFlattenedObjects } from "../util/transformations";
 
 // MonthlySummaryReport ------------------------------------------------------
 
 // Top-level view for Monthly Summary Report.
-
-// TODO - summary totals at the bottom.
 
 // Component Details ---------------------------------------------------------
 
@@ -52,6 +51,8 @@ const MonthlySummaryReport = () => {
 //    const [detailsItem, setDetailsItem] = useState(null);
     const [detailsItems, setDetailsItems] = useState(null);
     const [detailsTitle, setDetailsTitle] = useState("");
+    const [detailsTotals, setDetailsTotals] = useState({});
+    const [detailsTotalsTitle, setDetailsTotalsTitle] = useState("");
 
     const [summariesFields] = useState([
         "registrationDate",
@@ -63,7 +64,10 @@ const MonthlySummaryReport = () => {
         "totalSW",
         "totalUK",
         "totalAssigned",
+        "percentAssigned",
         "totalUnassigned",
+        "percentUnassigned",
+        "totalMats",
         "totalAmount",
     ]);
     const [summariesHeaders] = useState([
@@ -75,14 +79,19 @@ const MonthlySummaryReport = () => {
         "MM",
         "SW",
         "UK",
-        "Assigned",
-        "Unassigned",
+        "Used",
+        "%Used",
+        "Empty",
+        "%Empty",
+        "Total Mats",
         "Total $$",
     ]);
     const [summariesIndex, setSummariesIndex] = useState(-1);
 //    const [summariesItem, setSummariesItem] = useState(null);
     const [summariesItems, setSummariesItems] = useState(null);
     const [summariesTitle, setSummariesTitle] = useState("");
+    const [summariesTotals, setSummariesTotals] = useState({});
+    const [summariesTotalsTitle, setSummariesTotalsTitle] = useState("");
 
     const flattenedRegistrations = (registrations) => {
         let flattenedItems =
@@ -104,9 +113,6 @@ const MonthlySummaryReport = () => {
         } else {
             setSummariesIndex(newIndex);
 //            setSummariesItem(summariesItems[newIndex]);
-            setDetailsTitle("Daily Details for "
-                + facilityContext.selectedFacility.name
-                + " (" + summariesItems[newIndex].registrationDate + ")");
             FacilityClient.registrationDate(
                 facilityContext.selectedFacility.id,
                 summariesItems[newIndex].registrationDate,
@@ -121,6 +127,13 @@ const MonthlySummaryReport = () => {
                         + ")");
 //                    setDetailsIndex(-1);
                     setDetailsItems(registrations);
+                    setDetailsTitle("Daily Details for "
+                        + facilityContext.selectedFacility.name
+                        + " (" + summariesItems[newIndex].registrationDate + ")");
+                    setDetailsTotals(ReportTotals.registrationsTotals(registrations));
+                    setDetailsTotalsTitle("Daily Totals for "
+                        + facilityContext.selectedFacility.name
+                        + " (" + summariesItems[newIndex].registrationDate + ")");
                 })
                 .catch(err => {
                     reportError("MonthlySummaryReport.handleItemsSummaries()", err);
@@ -144,10 +157,29 @@ const MonthlySummaryReport = () => {
                         + JSON.stringify(response.data, ["facilityId", "registrationDate", "totalAssigned"])
                         + ")"
                     );
+                    response.data.forEach(summary => {
+                        summary.totalMats = summary.totalAssigned + summary.totalUnassigned;
+                        if (summary.totalMats === 0) {
+                            summary.percentAssigned = "0.0%";
+                            summary.percentUnassigned = "0.0%";
+                        } else {
+                            summary.percentAssigned =
+                                "" + (summary.totalAssigned * 100 / summary.totalMats).toFixed(1) + "%";
+                            summary.percentUnassigned =
+                                "" + (summary.totalUnassigned * 100 / summary.totalMats).toFixed(1) + "%";
+                        }
+                        summary.totalAmount = "$" + parseFloat(summary.totalAmount).toFixed(2);
+                    })
                     setSummariesIndex(-1);
 //                    setSummariesItem(null);
                     setSummariesItems(response.data);
                     setSummariesTitle("Monthly Summary for "
+                        + facilityContext.selectedFacility.name
+                        + " (" + registrationDateFrom
+                        + " - " + registrationDateTo + ")"
+                    )
+                    setSummariesTotals(ReportTotals.summariesTotals(response.data));
+                    setSummariesTotalsTitle("Monthly Totals for "
                         + facilityContext.selectedFacility.name
                         + " (" + registrationDateFrom
                         + " - " + registrationDateTo + ")"
@@ -251,6 +283,16 @@ const MonthlySummaryReport = () => {
                             Click on a row to display details for that date.
                         </Row>
 
+                        <Row className="ml-1 mr-1 mt-4">
+                            <List
+                                bordered
+                                fields={ReportTotals.summariesFields}
+                                headers={ReportTotals.summariesHeaders}
+                                items={[summariesTotals]}
+                                title={summariesTotalsTitle}
+                            />
+                        </Row>
+
                     </>
 
                 ) : null }
@@ -282,6 +324,16 @@ const MonthlySummaryReport = () => {
                                 items={detailsItems}
                                 striped
                                 title={detailsTitle}
+                            />
+                        </Row>
+
+                        <Row className="ml-1 mr-1 mt-4">
+                            <List
+                                bordered
+                                fields={ReportTotals.registrationsFields}
+                                headers={ReportTotals.registrationsHeaders}
+                                items={[detailsTotals]}
+                                title={detailsTotalsTitle}
                             />
                         </Row>
 
