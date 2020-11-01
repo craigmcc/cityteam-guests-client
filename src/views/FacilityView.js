@@ -34,31 +34,14 @@ const FacilityView = () => {
     }, []);
 
 
-    const onAdd = (event) => {
-        console.log("FacilityView.onAdd()");
-        setFacility(null);
-        setShow(true);
-    }
-
-    const onSearchChange = (event) => {
-        console.log("FacilityView.onSearchChange(" + event.target.value + ")");
-        setSearchText(event.target.value);
-        retrieveFacilities(event.target.value);
-    }
-
-    const onSearchClick = (event) => {
-        console.log("FacilityView.onSearchClick()");
-        retrieveFacilities(searchText);
-    }
-
-    const handleSelectedIndex = (newIndex) => {
+    const handleIndex = (newIndex) => {
         if (newIndex === index) {
-            console.info("FacilityView.handleSelectedIndex(-1)");
+            console.info("FacilityView.handleIndex(-1)");
             setFacility(null);
             setIndex(-1);
             setShow(false);
         } else {
-            console.info("FacilityView.handleSelectedIndex("
+            console.info("FacilityView.handleIndex("
                 + newIndex + ", "
                 + JSON.stringify(facilities[newIndex], ["id", "name"])
                 + ")");
@@ -66,6 +49,53 @@ const FacilityView = () => {
             setIndex(newIndex);
             setShow(true);
         }
+    }
+
+    const handleInsert = (facility) => {
+        console.info("FacilityView.handleInsert("
+            + JSON.stringify(facility, ["id", "name"])
+            + ")");
+        setShow(false);
+        retrieveFacilities(searchText);
+    }
+
+    const handleRemove = (facility) => {
+        console.info("FacilityView.handleRemove("
+            + JSON.stringify(facility, ["id", "name"])
+            + ")");
+        setShow(false);
+        retrieveFacilities(searchText);
+    }
+
+    const handleUpdate = (facility) => {
+        console.info("FacilityView.handleUpdate("
+            + JSON.stringify(facility, ["id", "name"])
+            + ")");
+        setShow(false);
+        retrieveFacilities(searchText);
+    }
+
+    const onAdd = () => {
+        console.info("FacilityView.onAdd()");
+        setFacility(null);
+        setShow(true);
+    }
+
+    const onChange = (event) => {
+        console.info("FacilityView.onChange(" + event.target.value + ")");
+        setSearchText(event.target.value);
+        retrieveFacilities(event.target.value);
+    }
+
+    const onClick = () => {
+        console.info("FacilityView.onClick()");
+        retrieveFacilities(searchText);
+    }
+
+    const onHide = () => {
+        console.info("FacilityView.onHide()");
+        setIndex(-1);
+        setShow(false);
     }
 
     const retrieveAllFacilities = () => {
@@ -100,11 +130,11 @@ const FacilityView = () => {
                     + JSON.stringify(response.data, ["id", "name"])
                     + ")");
                 setFacilities(response.data);
+                setIndex(-1);
             })
             .catch(error => {
                 reportError("FacilityView.retrieveMatchingFacilities()", error);
             });
-        setIndex(-1);
     }
 
     // TODO - skip modals for now
@@ -116,7 +146,7 @@ const FacilityView = () => {
 
                 <Row className="mb-3">
                     <Col className="col-4">
-                        <strong className="mr-2">CityTeam Facilities</strong>
+                        <strong className="mr-3">CityTeam Facilities</strong>
                         <ActionButton
                             label="Add"
                             onClick={onAdd}
@@ -127,8 +157,8 @@ const FacilityView = () => {
                         <SearchBar
                             fieldName="searchText"
                             fieldValue={searchText}
-                            onChange={onSearchChange}
-                            onClick={onSearchClick}
+                            onChange={onChange}
+                            onClick={onClick}
                             placeholder="Search by all or part of Facility name ..."
                             // withAction
                         />
@@ -141,7 +171,7 @@ const FacilityView = () => {
                         fields={["name", "active", "city", "state",
                                  "zipCode", "phone", "email"]}
                         footer
-                        handleIndex={handleSelectedIndex}
+                        handleIndex={handleIndex}
                         headers={["Name", "Active", "City", "State",
                                   "Zip Code", "Phone Number", "Email Address"]}
                         hover
