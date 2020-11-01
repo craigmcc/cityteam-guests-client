@@ -3,14 +3,14 @@ import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 
-import FacilityClient from "../clients/FacilityClient";
+import * as FacilityClient from "../clients/FacilityClient";
 import { FacilityContext } from "../contexts/FacilityContext";
-import DateSelector from "../library/components/DateSelector";
-import * as Months from "../library/util/Months";
+import ActionButton from "../library/components/ActionButton";
 import List from "../library/components/List";
+import MonthSelector from "../library/components/MonthSelector";
+import * as Months from "../library/util/Months";
 import { reportError } from "../util/error.handling";
 import { withFlattenedObjects } from "../util/transformations";
-import MonthSelector from "../library/components/MonthSelector";
 
 // MonthlySummaryReport ------------------------------------------------------
 
@@ -24,43 +24,155 @@ const MonthlySummaryReport = () => {
 
     const facilityContext = useContext(FacilityContext);
 
-    const [details, setDetails] = useState(null);
-    const [headingSummaries, setHeadingSummaries] = useState("");
-    const [headingSummary, setHeadingSummary] = useState("");
-    const [indexDetails, setIndexDetails] = useState(-1);
-    const [indexSummaries, setIndexSummaries] = useState(-1);
     const [selectedMonth, setSelectedMonth] = useState(Months.today());
-    const [summaries, setSummaries] = useState(null);
-    const [summary, setSummary] = useState(null);
 
-    const handleReport = () => {
-        console.info("MonthlySummaryReport.handleReport()");
-        // TODO - handleReport extra?
+    const [detailsFields] = useState([
+        "registrationDate",
+        "matNumberAndFeatures",
+        "guest.firstName",
+        "guest.lastName",
+        "paymentType",
+        "paymentAmount",
+        "showerTime",
+        "wakeupTime",
+        "comments",
+    ]);
+    const [detailsHeaders] = useState([
+        "Date",
+        "Mat",
+        "First Name",
+        "Last Name",
+        "$$",
+        "Amount",
+        "Shower",
+        "Wakeup",
+        "Comments",
+    ]);
+//    const [detailsIndex, setDetailsIndex] = useState(-1);
+//    const [detailsItem, setDetailsItem] = useState(null);
+    const [detailsItems, setDetailsItems] = useState(null);
+    const [detailsTitle, setDetailsTitle] = useState("");
+
+    const [summariesFields] = useState([
+        "registrationDate",
+        "total$$",
+        "totalAG",
+        "totalCT",
+        "totalFM",
+        "totalMM",
+        "totalSW",
+        "totalUK",
+        "totalAssigned",
+        "totalUnassigned",
+        "totalAmount",
+    ]);
+    const [summariesHeaders] = useState([
+        "Date",
+        "$$",
+        "AG",
+        "CT",
+        "FM",
+        "MM",
+        "SW",
+        "UK",
+        "Assigned",
+        "Unassigned",
+        "Total $$",
+    ]);
+    const [summariesIndex, setSummariesIndex] = useState(-1);
+//    const [summariesItem, setSummariesItem] = useState(null);
+    const [summariesItems, setSummariesItems] = useState(null);
+    const [summariesTitle, setSummariesTitle] = useState("");
+
+    const flattenedRegistrations = (registrations) => {
+        let flattenedItems =
+            withFlattenedObjects(registrations, "guest");
+        for (let flattenedItem of flattenedItems) {
+            flattenedItem.matNumberAndFeatures = "" + flattenedItem.matNumber;
+            if (flattenedItem.features) {
+                flattenedItem.matNumberAndFeatures += flattenedItem.features;
+            }
+        }
+        return flattenedItems;
     }
 
-    const handleSelectedMonth = (newMonth, newValid) => {
-        console.info("MonthlySummaryReport.handleSelectedMonth("
+    const handleSummariesIndex = (newIndex) => {
+        if (newIndex === summariesIndex) {
+            console.info("MonthlySummaryReort.handleSummariesIndex(-1)");
+            setSummariesIndex(-1);
+//            setSummariesItem(null);
+        } else {
+            setSummariesIndex(newIndex);
+//            setSummariesItem(summariesItems[newIndex]);
+            setDetailsTitle("Daily Details for "
+                + facilityContext.selectedFacility.name
+                + " (" + summariesItems[newIndex].registrationDate + ")");
+            FacilityClient.registrationDate(
+                facilityContext.selectedFacility.id,
+                summariesItems[newIndex].registrationDate,
+                   { withGuest: "" }
+            )
+                .then(response => {
+                    let registrations = flattenedRegistrations(response.data);
+                    console.info("MonthlySummaryReport.handleSummariesIndex("
+                        + newIndex
+                        + ", " + JSON.stringify(registrations,
+                            ["id", "registrationDate", "matNumberAndFeatures"])
+                        + ")");
+//                    setDetailsIndex(-1);
+                    setDetailsItems(registrations);
+                })
+                .catch(err => {
+                    reportError("MonthlySummaryReport.handleItemsSummaries()", err);
+                })
+        }
+    }
+
+    const handleSummariesReport = (newMonth, newValid) => {
+        console.info("MonthlySummaryReport.handleSummariesReport("
             + "month=" + newMonth
             + ", valid=" + newValid
             + ")");
         if (newValid) {
             setSelectedMonth(newMonth);
-            // TODO - handleSelectedMonth extra stuff
+            let registrationDateFrom = Months.startDate(newMonth);
+            let registrationDateTo = Months.endDate(newMonth);
+            FacilityClient.registrationSummary(facilityContext.selectedFacility.id,
+                registrationDateFrom, registrationDateTo)
+                .then(response => {
+                    console.info("MonthlySummaryReport.handleSummariesReport("
+                        + JSON.stringify(response.data, ["facilityId", "registrationDate", "totalAssigned"])
+                        + ")"
+                    );
+                    setSummariesIndex(-1);
+//                    setSummariesItem(null);
+                    setSummariesItems(response.data);
+                    setSummariesTitle("Monthly Summary for "
+                        + facilityContext.selectedFacility.name
+                        + " (" + registrationDateFrom
+                        + " - " + registrationDateTo + ")"
+                    )
+                })
+                .catch(error => {
+                    reportError("MonthlySummaryReport.handleReportSummaries()", error);
+                })
+        } else {
+            // Ignore any invalid selected month (being edited on fallback)
         }
     }
 
-    const onBackSummaries = () => {
-        console.info("MonthlySummary.onBackSummaries()");
-        setIndexSummaries(-1);
-        setSummaries(null);
-        setSummary(null);
+    const onBackDetails = () => {
+        console.info("MonthlySummary.onBackDetails()");
+//        setDetailsIndex(-1);
+//        setDetailsItem(null);
+        setDetailsItems(null);
     }
 
-    const onBackSummary = () => {
-        console.info("MonthlySummary.handleBackSummary()");
-        setDetails(null);
-        setIndexDetails(-1);
-        setSummary(null);
+    const onBackSummaries = () => {
+        console.info("MonthlySummary.handleBackSummaries()");
+        setSummariesIndex(-1);
+//        setSummariesItem(null);
+        setSummariesItems(null);
     }
 
     return (
@@ -69,7 +181,7 @@ const MonthlySummaryReport = () => {
 
             <Container fluid id="MonthlySummaryReport">
 
-                {(!summaries && !details) ? (
+                {(!summariesItems && !detailsItems) ? (
 
                     <>
 
@@ -86,8 +198,8 @@ const MonthlySummaryReport = () => {
                                     autoFocus={true}
                                     fieldClassName="col-7"
                                     fieldName="reportMonth"
-                                    fieldValue={Months.today()}
-                                    handleMonth={handleSelectedMonth}
+                                    fieldValue={selectedMonth}
+                                    handleMonth={handleSummariesReport}
                                     label="Report For:"
                                     labelClassName="col-3 text-right"
 //                                    max="2020-11"
@@ -96,6 +208,81 @@ const MonthlySummaryReport = () => {
                                     required
                                 />
                             </Col>
+                        </Row>
+
+                    </>
+
+                ) : null }
+
+                {(summariesItems && !detailsItems) ? (
+
+                    <>
+
+                        <Row className="ml-1 mr-1 mb-3">
+                            <Col className="text-left">
+                                Report Date:&nbsp;
+                                {(new Date()).toLocaleString()}
+                            </Col>
+                            <Col className="text-right">
+                                <ActionButton
+                                    label="Back"
+                                    onClick={onBackSummaries}
+                                    variant="primary"
+                                />
+                            </Col>
+                        </Row>
+
+                        <Row className="ml-1 mr-1 mb-3">
+                            <List
+                                bordered
+                                fields={summariesFields}
+                                footer
+                                handleIndex={handleSummariesIndex}
+                                headers={summariesHeaders}
+                                hover
+                                index={summariesIndex}
+                                items={summariesItems}
+                                striped
+                                title={summariesTitle}
+                            />
+                        </Row>
+
+                        <Row className="ml-1 mr-1">
+                            Click on a row to display details for that date.
+                        </Row>
+
+                    </>
+
+                ) : null }
+
+                {(detailsItems) ? (
+
+                    <>
+
+                        <Row className="ml-1 mr-1 mb-3">
+                            <Col className="text-left">
+                                Report Date:&nbsp;
+                                {(new Date()).toLocaleString()}
+                            </Col>
+                            <Col className="text-right">
+                                <ActionButton
+                                    label="Back"
+                                    onClick={onBackDetails}
+                                    variant="primary"
+                                />
+                            </Col>
+                        </Row>
+
+                        <Row className="ml-1 mr-1 mb-3">
+                            <List
+                                bordered
+                                fields={detailsFields}
+                                footer
+                                headers={detailsHeaders}
+                                items={detailsItems}
+                                striped
+                                title={detailsTitle}
+                            />
                         </Row>
 
                     </>
