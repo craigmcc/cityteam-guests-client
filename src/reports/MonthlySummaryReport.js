@@ -17,6 +17,10 @@ import { withFlattenedObjects } from "../util/transformations";
 
 // Top-level view for Monthly Summary Report.
 
+// NOTE:  The third level of this report is essentially equivalent to the
+// Daily Summary report that is available to all users.  Any changes here
+// need to be reflected there, and vice versa.
+
 // Component Details ---------------------------------------------------------
 
 const MonthlySummaryReport = () => {
@@ -107,7 +111,7 @@ const MonthlySummaryReport = () => {
 
     const handleSummariesIndex = (newIndex) => {
         if (newIndex === summariesIndex) {
-            console.info("MonthlySummaryReort.handleSummariesIndex(-1)");
+            console.info("MonthlySummaryReport.handleSummariesIndex(-1)");
             setSummariesIndex(-1);
 //            setSummariesItem(null);
         } else {
@@ -135,8 +139,8 @@ const MonthlySummaryReport = () => {
                         + facilityContext.selectedFacility.name
                         + " (" + summariesItems[newIndex].registrationDate + ")");
                 })
-                .catch(err => {
-                    reportError("MonthlySummaryReport.handleItemsSummaries()", err);
+                .catch(error => {
+                    reportError("MonthlySummaryReport.handleItemsSummaries()", error);
                 })
         }
     }

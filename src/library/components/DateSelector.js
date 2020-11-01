@@ -48,7 +48,7 @@ const DateSelector = (props) => {
             let result;
             switch (browser && browser.name) {
                 case "chrome":
-                    result = "month";
+                    result = "date";
                     break;
                 default:
                     result = "text";
@@ -57,7 +57,7 @@ const DateSelector = (props) => {
         }
 
         let newType = calculateType();
-        console.info("MonthSelector.useEffect(type=" + newType + ")");
+        console.info("DateSelector.useEffect(type=" + newType + ")");
         setType(newType);
 
     }, [])
