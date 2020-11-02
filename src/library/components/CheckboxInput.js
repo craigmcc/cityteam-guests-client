@@ -26,7 +26,7 @@ const CheckboxInput = (props) => {
 
     return (
 
-        <Col className={props.fieldClassName ? props.fieldClassName : null}>
+        <Col className={props.fieldClassName ? props.fieldClassName : "col-9"}>
             <input
                 autoFocus={props.autoFocus ? props.autoFocus : null}
                 checked={props.fieldValue ? props.fieldValue : false}

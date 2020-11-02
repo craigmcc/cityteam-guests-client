@@ -165,7 +165,7 @@ const GuestView = () => {
 
             <Container fluid id="GuestView">
 
-                <Row className="mb-3">
+                <Row className="ml-1 mr-1 mb-3">
                     <Col className="col-4">
                         <strong className="mr-3">
                             Guests for {facilityContext.selectedFacility.name}
@@ -188,7 +188,7 @@ const GuestView = () => {
                     </Col>
                 </Row>
 
-                <Row className="mb-3">
+                <Row className="ml-1 mr-1 mb-3">
                     <Col>
                         <Pagination
                             currentPage={currentPage}
@@ -216,7 +216,7 @@ const GuestView = () => {
                     />
                 </Row>
 
-                <Row className="mb-2 ml-1 mr-1">
+                <Row className="ml-1 mr-1">
                     Click &nbsp;<strong>Add</strong>&nbsp; for a new Guest, or
                     click on a row in the table to edit an existing one.
                 </Row>

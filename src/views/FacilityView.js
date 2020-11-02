@@ -145,7 +145,7 @@ const FacilityView = () => {
 
             <Container fluid id="FacilityView">
 
-                <Row className="mb-3">
+                <Row className="ml-1 mr-1 mb-3">
                     <Col className="col-4">
                         <strong className="mr-3">CityTeam Facilities</strong>
                         <ActionButton

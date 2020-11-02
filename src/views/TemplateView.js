@@ -1,15 +1,15 @@
 import React, { useContext, useEffect, useState } from "react";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
-
-// import Modal from "react-bootstrap/Modal";
 import Row from "react-bootstrap/Row";
 
-import * as FacilityClient from "../clients/FacilityClient";
-import { FacilityContext } from "../contexts/FacilityContext";
-// import TemplateForm from "../forms/TemplateForm";
 import ActionButton from "../library/components/ActionButton";
 import List from "../library/components/List";
+
+import * as FacilityClient from "../clients/FacilityClient";
+import * as TemplateClient from "../clients/TemplateClient";
+import { FacilityContext } from "../contexts/FacilityContext";
+import TemplateForm from "../forms/TemplateForm";
 import { reportError } from "../util/error.handling";
 import * as Replacers from "../util/Replacers";
 
@@ -24,7 +24,6 @@ const TemplateView = () => {
     const facilityContext = useContext(FacilityContext);
 
     const [index, setIndex] = useState(-1);
-    const [show, setShow] = useState(false);
     const [template, setTemplate] = useState(null);
     const [templates, setTemplates] = useState([]);
 
@@ -34,11 +33,23 @@ const TemplateView = () => {
         // eslint-disable-next-line
     }, [facilityContext.selectedFacility]);
 
+    const emptyValues = () => {
+        return {
+            id: -1,
+            active: true,
+            allMats: null,
+            comments: null,
+            facilityId: null,
+            handicapMats: null,
+            name: null,
+            socketMats: null
+        }
+    }
+
     const handleIndex = (newIndex) => {
         if (newIndex === index) {
             console.info("TemplateView.handleIndex(-1)");
             setIndex(-1);
-            setShow(false);
             setTemplate(null);
         } else {
             console.info("TemplateView.handleIndex("
@@ -46,45 +57,81 @@ const TemplateView = () => {
                 + JSON.stringify(templates[newIndex], Replacers.TEMPLATE)
                 + ")");
             setIndex(newIndex);
-            setShow(true);
             setTemplate(templates[newIndex]);
         }
     }
 
-    const handleInsert = (template) => {
-        console.info("TemplateView.handleInsert("
-            + JSON.stringify(template, Replacers.TEMPLATE)
-            + ")");
-        setShow(false);
-        retrieveAllTemplates();
+    const handleInsert = (inserted) => {
+        inserted.facilityId = facilityContext.selectedFacility.id;
+        TemplateClient.insert(inserted)
+            .then(response => {
+                console.info("TemplateView.handleInsert("
+                    + JSON.stringify(response, Replacers.TEMPLATE)
+                    + ")");
+                setIndex(-1);
+                setTemplate(null);
+            })
+            .catch(error => {
+                reportError("TemplateView.insert()", error);
+            })
     }
 
-    const handleRemove = (template) => {
-        console.info("TemplateView.handleRemove("
-            + JSON.stringify(template, Replacers.TEMPLATE)
-            + ")");
-        setShow(false);
-        retrieveAllTemplates();
+    const handleRemove = (removed) => {
+        removed.facilityId = facilityContext.selectedFacility.id;
+        TemplateClient.remove(removed.id)
+            .then(response => {
+                console.info("TemplateView.handleRemove("
+                    + JSON.stringify(response, Replacers.TEMPLATE)
+                    + ")");
+                setIndex(-1);
+                setTemplate(null);
+            })
+            .catch(error => {
+                reportError("TemplateView.remove()", error);
+            })
     }
 
-    const handleUpdate = (template) => {
-        console.info("TemplateView.handleUpdate("
-            + JSON.stringify(template, Replacers.TEMPLATE)
-            + ")");
-        setShow(false);
-        retrieveAllTemplates();
+    const handleUpdate = (updated) => {
+        updated.facilityId = facilityContext.selectedFacility.id;
+        TemplateClient.update(updated.id, updated)
+            .then(response => {
+                console.info("TemplateView.handleUpdate("
+                    + JSON.stringify(response, Replacers.TEMPLATE)
+                    + ")");
+                setIndex(-1);
+                setTemplate(null);
+            })
+            .catch(error => {
+                reportError("TemplateView.update()", error);
+            })
     }
+
+    const listFields = [
+        "name",
+        "active",
+        "allMats",
+        "handicapMats",
+        "socketMats"
+    ];
+
+    const listHeaders= [
+        "Name",
+        "Active",
+        "All Mats",
+        "Handicap Mats",
+        "Socket Mats"
+    ];
 
     const onAdd = () => {
         console.info("TemplateView.onAdd()");
-        setTemplate(null);
-        setShow(true);
+        setIndex(-1);
+        setTemplate(emptyValues());
     }
 
-    const onHide = () => {
-        console.info("TemplateView.onHide()");
+    const onBack = () => {
+        console.info("TemplateView.onBack()");
         setIndex(-1);
-        setShow(false);
+        setTemplate(null);
     }
 
     const retrieveAllTemplates = () => {
@@ -103,6 +150,7 @@ const TemplateView = () => {
                     + JSON.stringify(response.data, Replacers.TEMPLATE)
                     + ")");
                 setIndex(-1);
+                setTemplate(null);
                 setTemplates(response.data);
             })
             .catch(error => {
@@ -110,47 +158,96 @@ const TemplateView = () => {
             })
     }
 
-    // TODO - skip modals for now
     return (
 
         <>
 
             <Container fluid id="TemplateView">
 
-                <Row className="mb-3">
-                    <Col>
-                        <strong className="mr-3">
-                            Templates for {facilityContext.selectedFacility.name}
-                        </strong>
-                        <ActionButton
-                            label="Add"
-                            onClick={onAdd}
-                            variant="primary"
-                        />
-                    </Col>
-                </Row>
+                {(!template) ? (
 
-                <Row className="ml-1 mr-1">
-                    <List
-                        bordered
-                        fields={["name", "active", "allMats",
-                                 "handicapMats", "socketMats"]}
-                        handleIndex={handleIndex}
-                        headers={["Name", "Active", "All Mats",
-                                  "Handicap Mats", "Socket Mats"]}
-                        hover
-                        index={index}
-                        items={templates}
-                        striped
-                        title={"All Templates for "
-                               + facilityContext.selectedFacility.name}
-                    />
-                </Row>
+                        <>
 
-                <Row className="mb-1 ml-1 mr-1">
-                    Click &nbsp;<strong>Add</strong>&nbsp; for a new Facility, or
-                    click on a row in the table to edit an existing one.
-                </Row>
+                            {/* List View */}
+                            <Row className="ml-1 mr-1 mb-3">
+                                <Col>
+                                    <strong className="mr-3">
+                                        Templates for {facilityContext.selectedFacility.name}
+                                    </strong>
+                                    <ActionButton
+                                        label="Add"
+                                        onClick={onAdd}
+                                        variant="primary"
+                                    />
+                                </Col>
+                            </Row>
+
+                            <Row className="ml-1 mr-1">
+                                <List
+                                    bordered
+                                    fields={listFields}
+                                    handleIndex={handleIndex}
+                                    headers={listHeaders}
+                                    hover
+                                    index={index}
+                                    items={templates}
+                                    striped
+                                    title={"All Templates for "
+                                    + facilityContext.selectedFacility.name}
+                                />
+                            </Row>
+
+                            <Row className="mb-1 ml-1 mr-1">
+                                Click &nbsp;<strong>Add</strong>&nbsp; for a new Template, or
+                                click on a row in the table to edit an existing one.
+                            </Row>
+
+                        </>
+
+                    ) : null }
+
+                {(template) ? (
+
+                    <>
+
+                        {/* Form View */}
+                        <Row className="ml-1 mr-1 mb-3">
+                            <Col className="text-left">
+                                    <strong>
+                                        <>
+                                            {(template.id < 0) ? (
+                                                <span>Adding New</span>
+                                            ) : (
+                                                <span>Editing Existing</span>
+                                            )}
+                                            &nbsp;Template for {facilityContext.selectedFacility.name}
+                                        </>
+                                    </strong>
+                            </Col>
+                            <Col className="text-right">
+                                <ActionButton
+                                    label="Back"
+                                    onClick={onBack}
+                                    variant="primary"
+                                />
+                            </Col>
+                        </Row>
+
+                        <Row className="justify-content-center">
+                            <Col className="col-sm-9">
+                                <TemplateForm
+                                    autoFocus={true}
+                                    handleInsert={handleInsert}
+                                    handleRemove={handleRemove}
+                                    handleUpdate={handleUpdate}
+                                    template={template}
+                                />
+                            </Col>
+                        </Row>
+
+                    </>
+
+                ) : null }
 
             </Container>
 

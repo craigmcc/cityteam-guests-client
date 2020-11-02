@@ -12,7 +12,7 @@ import * as Months from "../library/util/Months";
 import { reportError } from "../util/error.handling";
 import * as ReportTotals from "../util/ReportTotals";
 import * as Replacers from "../util/Replacers";
-import { withFlattenedObjects } from "../util/transformations";
+import { withFlattenedObjects } from "../util/Transformations";
 
 // MonthlySummaryReport ------------------------------------------------------
 

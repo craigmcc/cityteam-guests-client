@@ -1,4 +1,4 @@
-// transformations -----------------------------------------------------------
+// Transformations -----------------------------------------------------------
 
 // Transform objects back and forth to how Formik wants fields presented
 

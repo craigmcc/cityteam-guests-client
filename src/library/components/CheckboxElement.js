@@ -28,12 +28,12 @@ import CommonAction from "./CommonAction";
 // actionSize               Action button size ("lg", "sm") [sm]
 // actionVariant            Action style variant [not rendered]
 // elementClassName         CSS styles for overall <Row> component [not rendered]
-// fieldClassName           CSS styles for the field <Col> element [not rendered]
+// fieldClassName           CSS styles for the field <Col> element [col-9]
 // fieldDisabled            Mark input to this field as disabled [not disabled]
-// fieldName                Element name (for label mapping) [select]
+// fieldName                Element name (for label mapping) [*REQUIRED*]
 // fieldValue               Initially selected field value [not rendered]
 // label                    Element label text [no label is rendered]
-// labelClassName           CSS styles for the element label <Col> element [not rendered]
+// labelClassName           CSS styles for the element label <Col> element [col-3]
 // onBlur                   Handle (event) for leaving input element [no handler]
 // onChange                 Handle (event) for input element value change [no handler]
 // onClick                  Handle (event) for action button click [no handler]
@@ -47,7 +47,7 @@ const CheckboxElement = (props) => {
     return (
 
         <Row
-            className={props.elementClassName ? props.elementClassName : "mt-1 mb-1 col-12"}
+            className={props.elementClassName ? props.elementClassName : "mt-2 mb-1 col-12"}
         >
             <CheckboxLabel {...props}/>
             <CheckboxInput {...props}/>

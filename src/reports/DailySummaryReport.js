@@ -12,7 +12,7 @@ import * as Dates from "../library/util/Dates";
 import { reportError } from "../util/error.handling";
 import * as Replacers from "../util/Replacers";
 import * as ReportTotals from "../util/ReportTotals";
-import { withFlattenedObjects } from "../util/transformations";
+import { withFlattenedObjects } from "../util/Transformations";
 
 // DailySummaryReport --------------------------------------------------------
 
