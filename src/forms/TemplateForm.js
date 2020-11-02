@@ -47,9 +47,9 @@ const TemplateForm = (props) => {
     const facilityContext = useContext(FacilityContext);
 
     const [adding] = useState(props.template.id < 0);
-    const [initialValues] = useState(Transformations.toEmptyStrings(props.template));
     const [showConfirm, setShowConfirm] = useState(false);
     const [template] = useState(props.template);
+    const [values, setValues] = useState(Transformations.toEmptyStrings(props.template));
 
 /*
     useEffect(() => {
@@ -103,10 +103,16 @@ const TemplateForm = (props) => {
         }
     }
 
-    // Dummy until replaced by Formik
+    // Dummy until replaced by Formik (which will deal with value updates itself)
+    // (((Does not seem to work on booleans, but that's ok for now)))
     const onChange = (event)  => {
-        console.info("TemplateForm.onChange(" + event.target.value + ")");
-        // TODO - need to store the right field value into initialValues
+        console.info("TemplateForm.onChange(" + event.target.value + ")", event);
+//        console.info("  Setting field '" + event.target.name + "' to '" + event.target.value + "'");
+        let updatedValues = {
+            ...values
+        }
+        updatedValues[event.target.name] = event.target.value;
+        setValues(updatedValues);
     }
 
     const onConfirm = () => {
@@ -223,37 +229,37 @@ const TemplateForm = (props) => {
                 <TextElement
                     autoFocus={props.autoFocus ? props.autoFocus : false}
                     fieldName="name"
-                    fieldValue={initialValues.name}
+                    fieldValue={values.name}
                     label="Name:"
                     onChange={onChange}
                 />
                 <CheckboxElement
                     fieldName="active"
-                    fieldValue={initialValues.active}
+                    fieldValue={values.active}
                     label="Active?"
                     onChange={onChange}
                 />
                 <TextElement
                     fieldName="comments"
-                    fieldValue={initialValues.comments}
+                    fieldValue={values.comments}
                     label="Comments:"
                     onChange={onChange}
                 />
                 <TextElement
                     fieldName="allMats"
-                    fieldValue={initialValues.allMats}
+                    fieldValue={values.allMats}
                     label="All Mats:"
                     onChange={onChange}
                 />
                 <TextElement
                     fieldName="handicapMats"
-                    fieldValue={initialValues.handicapMats}
+                    fieldValue={values.handicapMats}
                     label="Handicap Mats:"
                     onChange={onChange}
                 />
                 <TextElement
                     fieldName="socketMats"
-                    fieldValue={initialValues.socketMats}
+                    fieldValue={values.socketMats}
                     label="Socket Mats:"
                     onChange={onChange}
                 />
