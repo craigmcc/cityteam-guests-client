@@ -73,9 +73,10 @@ const FacilityView = () => {
                 console.info("FacilityView.handleInsert("
                     + JSON.stringify(inserted, Replacers.FACILITY)
                     + ")");
-                retrieveFacilities();
+                retrieveAllFacilities();
                 setFacility(null);
                 setIndex(-1);
+                setSearchText("");
             })
             .catch(error => {
                 reportError("FacilityView.insert()", error);
@@ -88,9 +89,10 @@ const FacilityView = () => {
                 console.info("FacilityView.handleRemove("
                     + JSON.stringify(response, Replacers.FACILITY)
                     + ")");
-                retrieveFacilities();
+                retrieveAllFacilities();
                 setFacility(null);
                 setIndex(-1);
+                setSearchText("");
             })
             .catch(error => {
                 reportError("FacilityView.remove()", error);
@@ -103,9 +105,10 @@ const FacilityView = () => {
                 console.info("FacilityView.handleUpdate("
                     + JSON.stringify(response, Replacers.TEMPLATE)
                     + ")");
-                retrieveFacilities();
+                retrieveAllFacilities();
                 setFacility(null);
                 setIndex(-1);
+                setSearchText("");
             })
             .catch(error => {
                 reportError("FacilityView.update()", error);
@@ -134,7 +137,7 @@ const FacilityView = () => {
 
     const onAdd = () => {
         console.info("FacilityView.onAdd()");
-        setFacility(null);
+        setFacility(emptyValues());
         setIndex(-1);
     }
 
@@ -278,7 +281,7 @@ const FacilityView = () => {
                         </Row>
 
                         <Row className="justify-content-center">
-                            <Col className="col-sm-9">
+                            <Col className="col-sm-10">
                                 <FacilityForm
                                     autoFocus={true}
                                     facility={facility}

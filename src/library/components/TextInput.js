@@ -12,6 +12,7 @@ import Col from "react-bootstrap/Col";
 // fieldDisabled            Mark input to this field as disabled [not disabled]
 // fieldName                Element name (for label mapping) [select]
 // fieldValue               Initially selected field value [not rendered]
+// htmlSize                 Size of this input field in characters [not rendered]
 // max                      Maximum allowed value [no restriction]
 // maxLength                Maximum allowed number of characters [no restriction]
 // min                      Minimum allowed value [no restriction]
@@ -50,6 +51,7 @@ const TextInput = (props) => {
                 pattern={props.pattern ? props.pattern : null}
                 placeholder={props.placeholder ? props.placeholder : null}
                 required={props.required ? props.required : null}
+                size={props.htmlSize ? props.htmlSize : null}
                 type={props.type ? props.type : "text"}
                 value={props.fieldValue ? props.fieldValue : ""}
             />

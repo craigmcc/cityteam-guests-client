@@ -305,11 +305,11 @@ const FacilityForm = (props) => {
                             <Row>
                                 <Col className="col-6">
                                     <TextElement
-                                        fieldClassName="col-7"
+                                        fieldClassName="col-8"
                                         fieldName="city"
                                         fieldValue={values.city}
                                         label="City:"
-                                        labelClassName="col-5"
+                                        labelClassName="col-4"
                                         onBlur={handleBlur}
                                         onChange={handleChange}
                                     />
@@ -319,7 +319,8 @@ const FacilityForm = (props) => {
                                         fieldClassName="col-8"
                                         fieldName="state"
                                         fieldValue={values.state}
-                                        label="St:"
+                                        htmlSize={2}
+                                        label="State:"
                                         labelClassName="col-4"
                                         onBlur={handleBlur}
                                         onChange={handleChange}
@@ -330,6 +331,7 @@ const FacilityForm = (props) => {
                                         fieldClassName="col-8"
                                         fieldName="zipCode"
                                         fieldValue={values.zipCode}
+                                        htmlSize={10}
                                         label="Zip:"
                                         labelClassName="col-4"
                                         onBlur={handleBlur}

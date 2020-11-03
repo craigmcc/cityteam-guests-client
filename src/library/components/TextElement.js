@@ -25,6 +25,7 @@ import TextInput from "./TextInput";
 // fieldDisabled            Mark input to this field as disabled [not disabled]
 // fieldName                Element name (for label mapping) [*REQUIRED*]
 // fieldValue               Initially selected field value [not rendered]
+// htmlSize                 Size of this input field in characters [not rendered]
 // label                    Element label text [no label is rendered]
 // labelClassName           CSS styles for the element label <Col> element [col-3]
 // max                      Maximum allowed value [no restriction]
