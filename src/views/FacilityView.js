@@ -1,17 +1,19 @@
 import React, { useContext, useEffect, useState } from "react";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
-// import Modal from "react-bootstrap/Modal";
 import Row from "react-bootstrap/Row";
 
-import * as FacilityClient from "../clients/FacilityClient";
-import { FacilityContext } from "../contexts/FacilityContext";
-// import FacilityForm from "../forms/FacilityForm";
 import ActionButton from "../library/components/ActionButton";
 import List from "../library/components/List";
 import SearchBar from "../library/components/SearchBar";
+
+import * as FacilityClient from "../clients/FacilityClient";
+import { FacilityContext } from "../contexts/FacilityContext";
+import FacilityForm from "../forms/FacilityForm";
 import { reportError } from "../util/error.handling";
 import * as Replacers from "../util/Replacers";
+import * as TemplateClient from "../clients/TemplateClient";
+import TemplateForm from "../forms/TemplateForm";
 
 // FacilityView --------------------------------------------------------------
 
@@ -27,7 +29,6 @@ const FacilityView = () => {
     const [facilities, setFacilities] = useState([]);
     const [index, setIndex] = useState(-1);
     const [searchText, setSearchText] = useState("");
-    const [show, setShow] = useState(false);
 
     useEffect(() => {
         console.info("FacilityView.useEffect()");
@@ -35,12 +36,27 @@ const FacilityView = () => {
     }, []);
 
 
+    const emptyValues = () => {
+        return {
+            id: -1,
+            active: true,
+            address1: null,
+            address2: null,
+            city: null,
+            email: null,
+            name: null,
+            phone: null,
+            state: null,
+            zipCode: null,
+
+        }
+    }
+
     const handleIndex = (newIndex) => {
         if (newIndex === index) {
             console.info("FacilityView.handleIndex(-1)");
             setFacility(null);
             setIndex(-1);
-            setShow(false);
         } else {
             console.info("FacilityView.handleIndex("
                 + newIndex + ", "
@@ -48,38 +64,84 @@ const FacilityView = () => {
                 + ")");
             setFacility(facilities[newIndex]);
             setIndex(newIndex);
-            setShow(true);
         }
     }
 
-    const handleInsert = (facility) => {
-        console.info("FacilityView.handleInsert("
-            + JSON.stringify(facility, Replacers.FACILITY)
-            + ")");
-        setShow(false);
-        retrieveFacilities(searchText);
+    const handleInsert = (inserted) => {
+        FacilityClient.insert(inserted)
+            .then(response => {
+                console.info("FacilityView.handleInsert("
+                    + JSON.stringify(inserted, Replacers.FACILITY)
+                    + ")");
+                retrieveFacilities();
+                setFacility(null);
+                setIndex(-1);
+            })
+            .catch(error => {
+                reportError("FacilityView.insert()", error);
+            })
     }
 
-    const handleRemove = (facility) => {
-        console.info("FacilityView.handleRemove("
-            + JSON.stringify(facility, Replacers.FACILITY)
-            + ")");
-        setShow(false);
-        retrieveFacilities(searchText);
+    const handleRemove = (removed) => {
+        FacilityClient.remove(removed.id)
+            .then(response => {
+                console.info("FacilityView.handleRemove("
+                    + JSON.stringify(response, Replacers.FACILITY)
+                    + ")");
+                retrieveFacilities();
+                setFacility(null);
+                setIndex(-1);
+            })
+            .catch(error => {
+                reportError("FacilityView.remove()", error);
+            })
     }
 
-    const handleUpdate = (facility) => {
-        console.info("FacilityView.handleUpdate("
-            + JSON.stringify(facility, Replacers.FACILITY)
-            + ")");
-        setShow(false);
-        retrieveFacilities(searchText);
+    const handleUpdate = (updated) => {
+        FacilityClient.update(updated.id, updated)
+            .then(response => {
+                console.info("FacilityView.handleUpdate("
+                    + JSON.stringify(response, Replacers.TEMPLATE)
+                    + ")");
+                retrieveFacilities();
+                setFacility(null);
+                setIndex(-1);
+            })
+            .catch(error => {
+                reportError("FacilityView.update()", error);
+            })
     }
+
+    const listFields = [
+        "name",
+        "active",
+        "city",
+        "state",
+        "zipCode",
+        "phone",
+        "email",
+    ];
+
+    const listHeaders = [
+        "Name",
+        "Active",
+        "City",
+        "State",
+        "Zip Code",
+        "Phone Number",
+        "Email Address",
+    ];
 
     const onAdd = () => {
         console.info("FacilityView.onAdd()");
         setFacility(null);
-        setShow(true);
+        setIndex(-1);
+    }
+
+    const onBack = () => {
+        console.info("FacilityView.onBack()");
+        setFacility(null);
+        setIndex(-1);
     }
 
     const onChange = (event) => {
@@ -91,12 +153,6 @@ const FacilityView = () => {
     const onClick = () => {
         console.info("FacilityView.onClick()");
         retrieveFacilities(searchText);
-    }
-
-    const onHide = () => {
-        console.info("FacilityView.onHide()");
-        setIndex(-1);
-        setShow(false);
     }
 
     const retrieveAllFacilities = () => {
@@ -112,7 +168,6 @@ const FacilityView = () => {
             .catch(error => {
                 reportError("FacilityView.retrieveAllFacilities()", error);
             });
-        setIndex(-1);
     }
 
     const retrieveFacilities = (newSearchText) => {
@@ -138,56 +193,105 @@ const FacilityView = () => {
             });
     }
 
-    // TODO - skip modals for now
     return (
 
         <>
 
             <Container fluid id="FacilityView">
 
-                <Row className="ml-1 mr-1 mb-3">
-                    <Col className="col-4">
-                        <strong className="mr-3">CityTeam Facilities</strong>
-                        <ActionButton
-                            label="Add"
-                            onClick={onAdd}
-                            variant="primary"
-                        />
-                    </Col>
-                    <Col className="col-8">
-                        <SearchBar
-                            fieldName="searchText"
-                            fieldValue={searchText}
-                            onChange={onChange}
-                            onClick={onClick}
-                            placeholder="Search by all or part of Facility name ..."
-                            // withAction
-                        />
-                    </Col>
-                </Row>
+                {(!facility) ? (
 
-                <Row className="ml-1 mr-1">
-                    <List
-                        bordered
-                        fields={["name", "active", "city", "state",
-                                 "zipCode", "phone", "email"]}
-                        // footer
-                        handleIndex={handleIndex}
-                        headers={["Name", "Active", "City", "State",
-                                  "Zip Code", "Phone Number", "Email Address"]}
-                        hover
-                        index={index}
-                        items={facilities}
-                        striped
-                        title={(searchText.length > 0 ? "Matching" : "All")
-                            + " CityTeam Facilities"}
-                    />
-                </Row>
+                    <>
 
-                <Row className="mb-2 ml-1 mr-1">
-                    Click &nbsp;<strong>Add</strong>&nbsp; for a new Facility, or
-                    click on a row in the table to edit an existing one.
-                </Row>
+                        {/* List View */}
+                        <Row className="ml-1 mr-1 mb-3">
+                            <Col className="col-4">
+                                <strong className="mr-3">CityTeam Facilities</strong>
+                                <ActionButton
+                                    label="Add"
+                                    onClick={onAdd}
+                                    variant="primary"
+                                />
+                            </Col>
+                            <Col className="col-8">
+                                <SearchBar
+                                    fieldName="searchText"
+                                    fieldValue={searchText}
+                                    onChange={onChange}
+                                    onClick={onClick}
+                                    placeholder="Search by all or part of Facility name ..."
+                                    // withAction
+                                />
+                            </Col>
+                        </Row>
+
+                        <Row className="ml-1 mr-1">
+                            <List
+                                bordered
+                                fields={listFields}
+                                // footer
+                                handleIndex={handleIndex}
+                                headers={listHeaders}
+                                hover
+                                index={index}
+                                items={facilities}
+                                striped
+                                title={(searchText.length > 0 ? "Matching" : "All")
+                                + " CityTeam Facilities"}
+                            />
+                        </Row>
+
+                        <Row className="mb-2 ml-1 mr-1">
+                            Click &nbsp;<strong>Add</strong>&nbsp; for a new Facility, or
+                            click on a row in the table to edit an existing one.
+                        </Row>
+
+                    </>
+
+                ) : null }
+
+                {(facility) ? (
+
+                    <>
+
+                        {/* Form View */}
+                        <Row className="ml-1 mr-1 mb-3">
+                            <Col className="text-left">
+                                <strong>
+                                    <>
+                                        {(facility.id < 0) ? (
+                                            <span>Adding New</span>
+                                        ) : (
+                                            <span>Editing Existing</span>
+                                        )}
+                                        &nbsp;Facility
+                                    </>
+                                </strong>
+                            </Col>
+                            <Col className="text-right">
+                                <ActionButton
+                                    label="Back"
+                                    onClick={onBack}
+                                    variant="primary"
+                                />
+                            </Col>
+                        </Row>
+
+                        <Row className="justify-content-center">
+                            <Col className="col-sm-9">
+                                <FacilityForm
+                                    autoFocus={true}
+                                    facility={facility}
+                                    handleInsert={handleInsert}
+                                    handleRemove={handleRemove}
+                                    handleUpdate={handleUpdate}
+                                />
+                            </Col>
+                        </Row>
+
+                    </>
+
+                ) : null }
 
             </Container>
 

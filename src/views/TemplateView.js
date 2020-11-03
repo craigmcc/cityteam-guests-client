@@ -42,7 +42,7 @@ const TemplateView = () => {
             facilityId: null,
             handicapMats: null,
             name: null,
-            socketMats: null
+            socketMats: null,
         }
     }
 
@@ -115,7 +115,7 @@ const TemplateView = () => {
         "comments",
         "allMats",
         "handicapMats",
-        "socketMats"
+        "socketMats",
     ];
 
     const listHeaders= [
@@ -124,7 +124,7 @@ const TemplateView = () => {
         "Comments",
         "All Mats",
         "Handicap Mats",
-        "Socket Mats"
+        "Socket Mats",
     ];
 
     const onAdd = () => {
