@@ -50,7 +50,7 @@ const TextElement = (props) => {
     return (
 
         <Row
-            className={props.elementClassName ? props.elementClassName : "mt-1 mb-1 col-12"}
+            className={props.elementClassName ? props.elementClassName : "mt-1 mb-2 col-12"}
         >
             <CommonLabel {...props}/>
             <TextInput {...props}/>

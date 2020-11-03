@@ -68,6 +68,7 @@ const TemplateView = () => {
                 console.info("TemplateView.handleInsert("
                     + JSON.stringify(response, Replacers.TEMPLATE)
                     + ")");
+                retrieveAllTemplates();
                 setIndex(-1);
                 setTemplate(null);
             })
@@ -83,6 +84,7 @@ const TemplateView = () => {
                 console.info("TemplateView.handleRemove("
                     + JSON.stringify(response, Replacers.TEMPLATE)
                     + ")");
+                retrieveAllTemplates();
                 setIndex(-1);
                 setTemplate(null);
             })
@@ -98,6 +100,7 @@ const TemplateView = () => {
                 console.info("TemplateView.handleUpdate("
                     + JSON.stringify(response, Replacers.TEMPLATE)
                     + ")");
+                retrieveAllTemplates();
                 setIndex(-1);
                 setTemplate(null);
             })
@@ -109,6 +112,7 @@ const TemplateView = () => {
     const listFields = [
         "name",
         "active",
+        "comments",
         "allMats",
         "handicapMats",
         "socketMats"
@@ -117,6 +121,7 @@ const TemplateView = () => {
     const listHeaders= [
         "Name",
         "Active",
+        "Comments",
         "All Mats",
         "Handicap Mats",
         "Socket Mats"

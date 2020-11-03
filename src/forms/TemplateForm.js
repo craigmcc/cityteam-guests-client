@@ -1,35 +1,33 @@
 import React, { useContext, /* useEffect, */ useState } from "react";
+import { Formik } from "formik";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
+import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 import Row from "react-bootstrap/Row";
 import * as Yup from "yup";
 
 import ActionButton from "../library/components/ActionButton";
 import CheckboxElement from "../library/components/CheckboxElement";
+import CommonError from "../library/components/CommonError";
 import RemoveButton from "../library/components/RemoveButton";
-import ResetButton from "../library/components/ResetButton";
 import SaveButton from "../library/components/SaveButton";
 import TextElement from "../library/components/TextElement";
 
 import * as FacilityClient from "../clients/FacilityClient";
-// import * as TemplateClient from "../clients/TemplateClient";
 import { FacilityContext } from "../contexts/FacilityContext";
 import MatsList from "../util/mats.list";
 import * as Replacers from "../util/Replacers";
 import * as Transformations from "../util/Transformations";
-// import {reportError} from "../util/error.handling";
 
 // TemplateForm --------------------------------------------------------------
 
-// Input form for editing Template contents.
+// Input form for editing Template contents (with Formik-based validations).
 
 // NOTES:
 // - handleInsert or handleUpdate will only be called when all
 //   validations pass.
 // - Parent component can abandon a form with no complications.
-
-// TODO - Initial version only based on elements, not Formik.
 
 // Incoming Properties -------------------------------------------------------
 
@@ -47,17 +45,10 @@ const TemplateForm = (props) => {
     const facilityContext = useContext(FacilityContext);
 
     const [adding] = useState(props.template.id < 0);
+    const [index, setIndex] = useState(-1);
+    const [initialValues] = useState(Transformations.toEmptyStrings(props.template));
     const [showConfirm, setShowConfirm] = useState(false);
-    const [template] = useState(props.template);
-    const [values, setValues] = useState(Transformations.toEmptyStrings(props.template));
-
-/*
-    useEffect(() => {
-        console.info("TemplateForm.adding:                  ", adding);
-        console.info("TemplateForm.useEffect initialValues: ", initialValues);
-        console.info("TemplateForm.useEffect template:      ", template);
-    })
-*/
+    const [validated, setValidated] = useState(false);
 
     const handleInsert = (values) => {
         console.info("TemplateForm.handleInsert("
@@ -65,6 +56,9 @@ const TemplateForm = (props) => {
             + ")");
         if (props.handleInsert) {
             props.handleInsert(Transformations.toNullValues(values));
+        } else {
+            alert("TemplateForm: Programming error, no handleInsert defined,"
+                + "so no insert is possible.");
         }
     }
 
@@ -73,7 +67,10 @@ const TemplateForm = (props) => {
             + JSON.stringify(values, Replacers.TEMPLATE)
             + ")");
         if (props.handleRemove) {
-            props.handleRemove(Transformations.toNullValues(values));
+            props.handleRemove(initialValues);
+        } else {
+            alert("TemplateForm: Programming error, no handleRemove defined,"
+                + "so no remove is possible.");
         }
     }
 
@@ -83,13 +80,9 @@ const TemplateForm = (props) => {
             + ")");
         actions.setSubmitting(true);
         if (adding) {
-            if (props.handleInsert) {
-                props.handleInsert(values);
-            }
+            handleInsert(values);
         } else {
-            if (props.handleUpdate) {
-                props.handleUpdate(values);
-            }
+            handleUpdate(values);
         }
         actions.setSubmitting(false);
     }
@@ -100,33 +93,24 @@ const TemplateForm = (props) => {
             + ")");
         if (props.handleUpdate) {
             props.handleUpdate(Transformations.toNullValues(values));
+        } else {
+            alert("TemplateForm: Programming error, no handleUpdate defined,"
+                + "so no update is possible.");
         }
-    }
-
-    // Dummy until replaced by Formik (which will deal with value updates itself)
-    // (((Does not seem to work on booleans, but that's ok for now)))
-    const onChange = (event)  => {
-        console.info("TemplateForm.onChange(" + event.target.value + ")", event);
-//        console.info("  Setting field '" + event.target.name + "' to '" + event.target.value + "'");
-        let updatedValues = {
-            ...values
-        }
-        updatedValues[event.target.name] = event.target.value;
-        setValues(updatedValues);
     }
 
     const onConfirm = () => {
-        console.info("TemplateForm.onConfirm()");
+        console.info("TemplateFormOld.onConfirm()");
         setShowConfirm(true);
     }
 
     const onConfirmNegative = () => {
-        console.info("TemplateForm.onConfirmNegative()");
+        console.info("TemplateFormOld.onConfirmNegative()");
         setShowConfirm(false);
     }
 
     const onConfirmPositive = () => {
-        console.info("TemplateForm.onConfirmPositive()");
+        console.info("TemplateFormOld.onConfirmPositive()");
         setShowConfirm(false);
         handleRemove();
     }
@@ -170,12 +154,15 @@ const TemplateForm = (props) => {
         }
     }
 
-    const validateUniqueName = (value, facilityId, id) => {
+    const validateUniqueName = (value, facilityId, templateId) => {
         return new Promise((resolve) => {
-            FacilityClient.templateExact(facilityId, value)
+            FacilityClient.templateExact(
+                facilityId,
+                value
+            )
                 .then(response => {
-                    // Exists but OK if it is this item
-                    resolve(id === response.data.id);
+                    // Exists but OK if it is this template
+                    resolve(templateId === response.data.id);
                 })
                 .catch(() => {
                     // Does not exist, so definitely unique
@@ -185,40 +172,39 @@ const TemplateForm = (props) => {
     }
 
     const validationSchema = Yup.object().shape({
-            name: Yup.string()
-                .required("Name is required")
-                .test("unique-name",
-                    "That name is already in use within this facility",
-                    (value) => validateUniqueName(value,
-                        facilityContext.selectedFacility.id,
-                        template.id)),
-            comments: Yup.string(),
-            allMats: Yup.string()
-                .required("All Mats list is required")
-                .test("valid-all-mats",
-                    "Invalid All Mats list format",
-                    (value) => validateMatsList(value)),
-            handicapMats: Yup.string()
-                .test("valid-handicap-mats",
-                    "Invalid Handicap Mats list format",
-                    (value) => validateMatsList(value))
-                .test("handicap-mats-subset",
-                    "Handicap Mats must be a subset of All Mats",
-                    function (value) {
-                        return validateMatsSubset(value, this.parent.allMats);
-                    }),
-            socketMats: Yup.string()
-                .test("valid-socket-mats",
-                    "Invalid Socket Mats list format",
-                    (value) => validateMatsList(value))
-                .test("socket-mats-subset",
-                    "Socket Mats must be a subset of All Mats",
-                    function (value) {
-                        return validateMatsSubset(value, this.parent.allMats);
-                    }),
-        });
+        name: Yup.string()
+            .required("Name is required")
+            .test("unique-name",
+                "That name is already in use within this facility",
+                (value) => validateUniqueName(value,
+                    facilityContext.selectedFacility.id,
+                    props.template.id)),
+        comments: Yup.string(),
+        allMats: Yup.string()
+            .required("All Mats list is required")
+            .test("all-mats-valid",
+                "Invalid All Mats list format",
+                (value) => validateMatsList(value)),
+        handicapMats: Yup.string()
+            .test("handicap-mats-valid",
+                "Invalid Handicap Mats list format",
+                (value) => validateMatsList(value))
+            .test("handicap-mats-subset",
+                "Handicap Mats must be a subset of All Mats",
+                function (value) {
+                    return validateMatsSubset(value, this.parent.allMats);
+                }),
+        socketMats: Yup.string()
+            .test("socket-mats-valid",
+                "Invalid Socket Mats list format",
+                (value) => validateMatsList(value))
+            .test("socket-mats-subset",
+                "Socket Mats must be a subset of All Mats",
+                function (value) {
+                    return validateMatsSubset(value, this.parent.allMats);
+                }),
+    });
 
-    // TODO - Repackage as Formik based when ready
     return (
 
         <>
@@ -226,58 +212,121 @@ const TemplateForm = (props) => {
             {/* Details Form */}
             <Container fluid id="TemplateForm">
 
-                <TextElement
-                    autoFocus={props.autoFocus ? props.autoFocus : false}
-                    fieldName="name"
-                    fieldValue={values.name}
-                    label="Name:"
-                    onChange={onChange}
-                />
-                <CheckboxElement
-                    fieldName="active"
-                    fieldValue={values.active}
-                    label="Active?"
-                    onChange={onChange}
-                />
-                <TextElement
-                    fieldName="comments"
-                    fieldValue={values.comments}
-                    label="Comments:"
-                    onChange={onChange}
-                />
-                <TextElement
-                    fieldName="allMats"
-                    fieldValue={values.allMats}
-                    label="All Mats:"
-                    onChange={onChange}
-                />
-                <TextElement
-                    fieldName="handicapMats"
-                    fieldValue={values.handicapMats}
-                    label="Handicap Mats:"
-                    onChange={onChange}
-                />
-                <TextElement
-                    fieldName="socketMats"
-                    fieldValue={values.socketMats}
-                    label="Socket Mats:"
-                    onChange={onChange}
-                />
+                <Formik
+                    initialValues={initialValues}
+                    onSubmit={(values, actions) => {
+                        handleSubmit(values, actions);
+                    }}
+                    validateOnChange={false}
+                    validationSchema={validationSchema}
+                >
+                    {( {
+                        errors,
+                        handleBlur,
+                        handleChange,
+                        handleSubmit,
+                        isSubmitting,
+                        isValid,
+                        touched,
+                        values,
+                    }) => (
+                        <Form
+                            className="mx-auto"
+                            noValidate
+                            onSubmit={handleSubmit}
+                            validated={validated}
+                        >
 
-                <Row className="mt-3">
-                    <Col className="col-3"/>
-                    <Col className="col-7">
-                        <SaveButton/>
-                        <span>&nbsp;&nbsp;</span>
-                        <ResetButton/>
-                    </Col>
-                    <Col className="col-2 float-right">
-                        <RemoveButton
-                            disabled={adding}
-                            onClick={onConfirm}
-                        />
-                    </Col>
-                </Row>
+                            <TextElement
+                                autoFocus={props.autoFocus}
+                                fieldName="name"
+                                fieldValue={values.name}
+                                label="Name:"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                            />
+                            <CommonError
+                                errors={errors.name}
+                                touched={touched.name}
+                            />
+
+                            <CheckboxElement
+                                fieldName="active"
+                                fieldValue={values.active}
+                                label="Active?"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                            />
+                            <CommonError
+                                errors={errors.active}
+                                touched={touched.active}
+                            />
+
+                            <TextElement
+                                fieldName="comments"
+                                fieldValue={values.comments}
+                                label="Comments:"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                            />
+                            <CommonError
+                                errors={errors.comments}
+                                touched={touched.comments}
+                            />
+
+                            <TextElement
+                                fieldName="allMats"
+                                fieldValue={values.allMats}
+                                label="All Mats:"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                            />
+                            <CommonError
+                                errors={errors.allMats}
+                                touched={touched.allMats}
+                            />
+
+                            <TextElement
+                                fieldName="handicapMats"
+                                fieldValue={values.handicapMats}
+                                label="HandicapMats:"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                            />
+                            <CommonError
+                                errors={errors.handicapMats}
+                                touched={touched.handicapMats}
+                            />
+
+                            <TextElement
+                                fieldName="socketMats"
+                                fieldValue={values.socketMats}
+                                label="SocketMats:"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                            />
+                            <CommonError
+                                errors={errors.socketMats}
+                                touched={touched.socketMats}
+                            />
+
+                            <Row className="mt-3">
+                                <Col className="col-3"/>
+                                <Col className="col-7">
+                                    <SaveButton
+                                        disabled={isSubmitting || !isValid}/>
+                                </Col>
+                                <Col className="col-2 float-right">
+                                    <RemoveButton
+                                        disabled={adding}
+                                        onClick={onConfirm}
+                                    />
+                                </Col>
+                            </Row>
+
+                        </Form>
+                    )}
+                </Formik>
 
             </Container>
 
