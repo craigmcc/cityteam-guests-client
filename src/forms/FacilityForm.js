@@ -1,4 +1,4 @@
-import React, { useContext, /* useEffect, */ useState } from "react";
+import React, { useState } from "react";
 import { Formik } from "formik";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
@@ -16,7 +16,6 @@ import TextElement from "../library/components/TextElement";
 import * as Validations from "../library/util/Validations";
 
 import * as FacilityClient from "../clients/FacilityClient";
-import { FacilityContext } from "../contexts/FacilityContext";
 import * as Replacers from "../util/Replacers";
 import * as Transformations from "../util/Transformations";
 
@@ -37,18 +36,15 @@ import * as Transformations from "../util/Transformations";
 // handleInsert             Handle (facility) insert request [no handler]
 // handleRemote             Handle (facility) remove request [no handler]
 // handleUpdate             Handle (facility) update request [no handler]
+// onConfirmNegative        Handle () on negative confirmation [no handler]
 
 // Component Details ---------------------------------------------------------
 
 const FacilityForm = (props) => {
 
-    const facilityContext = useContext(FacilityContext);
-
     const [adding] = useState(props.facility.id < 0);
-    const [index, setIndex] = useState(-1);
     const [initialValues] = useState(Transformations.toEmptyStrings(props.facility));
     const [showConfirm, setShowConfirm] = useState(false);
-    const [validated, setValidated] = useState(false);
 
     const handleInsert = (values) => {
         console.info("FacilityForm.handleInsert("
@@ -107,6 +103,9 @@ const FacilityForm = (props) => {
     const onConfirmNegative = () => {
         console.info("FacilityFormOld.onConfirmNegative()");
         setShowConfirm(false);
+        if (props.onConfirmNegative) {
+            props.onConfirmNegative();
+        }
     }
 
     const onConfirmPositive = () => {
@@ -184,7 +183,7 @@ const FacilityForm = (props) => {
                             className="mx-auto"
                             noValidate
                             onSubmit={handleSubmit}
-                            validated={validated}
+                            validated={false}
                         >
 
                             <TextElement
@@ -251,56 +250,6 @@ const FacilityForm = (props) => {
                                 labelClassName="col-2"
                                 touched={touched.address2}
                             />
-
-{/*
-                            <TextElement
-                                fieldClassName="col-10"
-                                fieldName="city"
-                                fieldValue={values.city}
-                                label="City:"
-                                labelClassName="col-2"
-                                onBlur={handleBlur}
-                                onChange={handleChange}
-                            />
-                            <CommonError
-                                errors={errors.city}
-                                fieldClassName="col-10"
-                                labelClassName="col-2"
-                                touched={touched.city}
-                            />
-
-                            <TextElement
-                                fieldClassName="col-10"
-                                fieldName="state"
-                                fieldValue={values.state}
-                                label="State:"
-                                labelClassName="col-2"
-                                onBlur={handleBlur}
-                                onChange={handleChange}
-                            />
-                            <CommonError
-                                errors={errors.state}
-                                fieldClassName="col-10"
-                                labelClassName="col-2"
-                                touched={touched.state}
-                            />
-
-                            <TextElement
-                                fieldClassName="col-10"
-                                fieldName="zipCode"
-                                fieldValue={values.zipCode}
-                                label="Zip Code:"
-                                labelClassName="col-2"
-                                onBlur={handleBlur}
-                                onChange={handleChange}
-                            />
-                            <CommonError
-                                errors={errors.zipCode}
-                                fieldClassName="col-10"
-                                labelClassName="col-2"
-                                touched={touched.zipCode}
-                            />
-*/}
 
                             <Row>
                                 <Col className="col-6">

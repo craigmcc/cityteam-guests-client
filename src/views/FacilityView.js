@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
@@ -8,11 +8,9 @@ import List from "../library/components/List";
 import SearchBar from "../library/components/SearchBar";
 
 import * as FacilityClient from "../clients/FacilityClient";
-import { FacilityContext } from "../contexts/FacilityContext";
 import FacilityForm from "../forms/FacilityForm";
 import { reportError } from "../util/error.handling";
 import * as Replacers from "../util/Replacers";
-import * as TemplateClient from "../clients/TemplateClient";
 import TemplateForm from "../forms/TemplateForm";
 
 // FacilityView --------------------------------------------------------------
@@ -23,10 +21,8 @@ import TemplateForm from "../forms/TemplateForm";
 
 const FacilityView = () => {
 
-    const facilityContext = useContext(FacilityContext);
-
-    const [facility, setFacility] = useState(null);
     const [facilities, setFacilities] = useState([]);
+    const [facility, setFacility] = useState(null);
     const [index, setIndex] = useState(-1);
     const [searchText, setSearchText] = useState("");
 
@@ -71,7 +67,7 @@ const FacilityView = () => {
         FacilityClient.insert(inserted)
             .then(response => {
                 console.info("FacilityView.handleInsert("
-                    + JSON.stringify(inserted, Replacers.FACILITY)
+                    + JSON.stringify(response.data, Replacers.FACILITY)
                     + ")");
                 retrieveAllFacilities();
                 setFacility(null);
@@ -79,7 +75,7 @@ const FacilityView = () => {
                 setSearchText("");
             })
             .catch(error => {
-                reportError("FacilityView.insert()", error);
+                reportError("FacilityView.handleInsert()", error);
             })
     }
 
@@ -87,7 +83,7 @@ const FacilityView = () => {
         FacilityClient.remove(removed.id)
             .then(response => {
                 console.info("FacilityView.handleRemove("
-                    + JSON.stringify(response, Replacers.FACILITY)
+                    + JSON.stringify(response.data, Replacers.FACILITY)
                     + ")");
                 retrieveAllFacilities();
                 setFacility(null);
@@ -95,7 +91,7 @@ const FacilityView = () => {
                 setSearchText("");
             })
             .catch(error => {
-                reportError("FacilityView.remove()", error);
+                reportError("FacilityView.handleRemove()", error);
             })
     }
 
@@ -103,7 +99,7 @@ const FacilityView = () => {
         FacilityClient.update(updated.id, updated)
             .then(response => {
                 console.info("FacilityView.handleUpdate("
-                    + JSON.stringify(response, Replacers.TEMPLATE)
+                    + JSON.stringify(response.data, Replacers.TEMPLATE)
                     + ")");
                 retrieveAllFacilities();
                 setFacility(null);
@@ -111,7 +107,7 @@ const FacilityView = () => {
                 setSearchText("");
             })
             .catch(error => {
-                reportError("FacilityView.update()", error);
+                reportError("FacilityView.handleUpdate()", error);
             })
     }
 
@@ -288,6 +284,7 @@ const FacilityView = () => {
                                     handleInsert={handleInsert}
                                     handleRemove={handleRemove}
                                     handleUpdate={handleUpdate}
+                                    onConfirmNegative={onBack}
                                 />
                             </Col>
                         </Row>

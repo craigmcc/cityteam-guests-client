@@ -35,6 +35,7 @@ import * as Transformations from "../util/Transformations";
 // handleInsert             Handle (template) insert request [no handler]
 // handleRemote             Handle (template) remove request [no handler]
 // handleUpdate             Handle (template) update request [no handler]
+// onConfirmNegative        Handle () on negative confirmation [no handler]
 // template                 Template containing initial values,
 //                          id<0 for adding [*REQUIRED*]
 
@@ -45,10 +46,8 @@ const TemplateForm = (props) => {
     const facilityContext = useContext(FacilityContext);
 
     const [adding] = useState(props.template.id < 0);
-    const [index, setIndex] = useState(-1);
     const [initialValues] = useState(Transformations.toEmptyStrings(props.template));
     const [showConfirm, setShowConfirm] = useState(false);
-    const [validated, setValidated] = useState(false);
 
     const handleInsert = (values) => {
         console.info("TemplateForm.handleInsert("
@@ -57,7 +56,7 @@ const TemplateForm = (props) => {
         if (props.handleInsert) {
             props.handleInsert(Transformations.toNullValues(values));
         } else {
-            alert("TemplateForm: Programming error, no handleInsert defined,"
+            alert("TemplateForm: Programming error, no handleInsert defined, "
                 + "so no insert is possible.");
         }
     }
@@ -69,7 +68,7 @@ const TemplateForm = (props) => {
         if (props.handleRemove) {
             props.handleRemove(initialValues);
         } else {
-            alert("TemplateForm: Programming error, no handleRemove defined,"
+            alert("TemplateForm: Programming error, no handleRemove defined, "
                 + "so no remove is possible.");
         }
     }
@@ -94,23 +93,26 @@ const TemplateForm = (props) => {
         if (props.handleUpdate) {
             props.handleUpdate(Transformations.toNullValues(values));
         } else {
-            alert("TemplateForm: Programming error, no handleUpdate defined,"
+            alert("TemplateForm: Programming error, no handleUpdate defined, "
                 + "so no update is possible.");
         }
     }
 
     const onConfirm = () => {
-        console.info("TemplateFormOld.onConfirm()");
+        console.info("TemplateForm.onConfirm()");
         setShowConfirm(true);
     }
 
     const onConfirmNegative = () => {
-        console.info("TemplateFormOld.onConfirmNegative()");
+        console.info("TemplateForm.onConfirmNegative()");
         setShowConfirm(false);
+        if (props.onConfirmNegative) {
+            props.onConfirmNegative();
+        }
     }
 
     const onConfirmPositive = () => {
-        console.info("TemplateFormOld.onConfirmPositive()");
+        console.info("TemplateForm.onConfirmPositive()");
         setShowConfirm(false);
         handleRemove();
     }
@@ -234,7 +236,7 @@ const TemplateForm = (props) => {
                             className="mx-auto"
                             noValidate
                             onSubmit={handleSubmit}
-                            validated={validated}
+                            validated={false}
                         >
 
                             <TextElement

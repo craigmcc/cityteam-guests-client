@@ -66,14 +66,14 @@ const TemplateView = () => {
         TemplateClient.insert(inserted)
             .then(response => {
                 console.info("TemplateView.handleInsert("
-                    + JSON.stringify(response, Replacers.TEMPLATE)
+                    + JSON.stringify(response.data, Replacers.TEMPLATE)
                     + ")");
                 retrieveAllTemplates();
                 setIndex(-1);
                 setTemplate(null);
             })
             .catch(error => {
-                reportError("TemplateView.insert()", error);
+                reportError("TemplateView.handleInsert()", error);
             })
     }
 
@@ -82,14 +82,14 @@ const TemplateView = () => {
         TemplateClient.remove(removed.id)
             .then(response => {
                 console.info("TemplateView.handleRemove("
-                    + JSON.stringify(response, Replacers.TEMPLATE)
+                    + JSON.stringify(response.data, Replacers.TEMPLATE)
                     + ")");
                 retrieveAllTemplates();
                 setIndex(-1);
                 setTemplate(null);
             })
             .catch(error => {
-                reportError("TemplateView.remove()", error);
+                reportError("TemplateView.handleRemove()", error);
             })
     }
 
@@ -98,14 +98,14 @@ const TemplateView = () => {
         TemplateClient.update(updated.id, updated)
             .then(response => {
                 console.info("TemplateView.handleUpdate("
-                    + JSON.stringify(response, Replacers.TEMPLATE)
+                    + JSON.stringify(response.data, Replacers.TEMPLATE)
                     + ")");
                 retrieveAllTemplates();
                 setIndex(-1);
                 setTemplate(null);
             })
             .catch(error => {
-                reportError("TemplateView.update()", error);
+                reportError("TemplateView.handleUpdate()", error);
             })
     }
 
@@ -245,6 +245,7 @@ const TemplateView = () => {
                                     handleInsert={handleInsert}
                                     handleRemove={handleRemove}
                                     handleUpdate={handleUpdate}
+                                    onConfirmNegative={onBack}
                                     template={template}
                                 />
                             </Col>
