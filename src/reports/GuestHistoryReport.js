@@ -207,7 +207,7 @@ const GuestHistoryReport = () => {
                                 headers={["First Name", "Last Name",
                                     "Active", "Comments About Guest"]}
                                 hover
-                                index={index}
+//                                index={index}
                                 items={guests}
                                 striped
                             />
@@ -249,7 +249,7 @@ const GuestHistoryReport = () => {
                                 footer
                                 headers={["Date", "Mat", "$$", "Amount",
                                     "Shower", "Wakeup", "Comments"]}
-                                index={-1}
+                                index={index}
                                 items={registrations}
                                 striped
                                 title={heading}

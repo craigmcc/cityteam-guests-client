@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 
-import FacilityClient from "../clients/FacilityClient";
+import * as FacilityClient from "../clients/FacilityClient";
 import { FacilityContext } from "../contexts/FacilityContext";
 import SelectElement from "../library/components/SelectElement";
 import { reportError } from "../util/error.handling";
@@ -29,7 +29,7 @@ import { reportError } from "../util/error.handling";
 
 // Component Details ---------------------------------------------------------
 
-export const TemplateSelector = (props) => {
+const TemplateSelector = (props) => {
 
     const facilityContext = useContext(FacilityContext);
 
@@ -86,7 +86,9 @@ export const TemplateSelector = (props) => {
         console.log("TemplateSelector.retrieveAllItems for("
             + JSON.stringify(facilityContext.selectedFacility, ["id", "name"])
             + ")");
-        FacilityClient.templateAll(facilityContext.selectedFacility.id)
+        FacilityClient.templateAll(
+            facilityContext.selectedFacility.id
+        )
             .then(response => {
                 console.log("TemplateSelector.retrieveAllItems got("
                     + JSON.stringify(response.data, ["id", "name"])

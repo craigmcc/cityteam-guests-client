@@ -4,7 +4,8 @@ export const FACILITY = ["id", "name"];
 
 export const GUEST = ["id", "firstName", "lastName"];
 
-export const REGISTRATION = ["id", "registrationDate", "matNumberAndFeatures"];
+export const REGISTRATION = ["id", "registrationDate", "matNumberAndFeatures",
+    "guest.firstName", "guest.lastName"];
 
 export const SUMMARY = ["registrationDate", "totalAssigned", "totalUnassigned"];
 

@@ -128,7 +128,7 @@ const DailySummaryReport = () => {
                                     actionClassName="col-2"
                                     autoFocus={true}
                                     fieldClassName="col-7"
-                                    fieldName="reportMonth"
+                                    fieldName="reportDate"
                                     fieldValue={selectedDate}
                                     handleDate={handleDetailsReport}
                                     label="Report For:"
