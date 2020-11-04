@@ -14,7 +14,6 @@ import { FacilityContext } from "../contexts/FacilityContext";
 import GuestForm from "../forms/GuestForm";
 import { reportError } from "../util/error.handling";
 import * as Replacers from "../util/Replacers";
-import TemplateForm from "../forms/TemplateForm";
 
 // GuestView -----------------------------------------------------------------
 

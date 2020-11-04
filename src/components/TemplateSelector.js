@@ -83,7 +83,7 @@ const TemplateSelector = (props) => {
             setTemplates([]);
             return;
         }
-        console.log("TemplateSelector.retrieveAllItems for("
+        console.info("TemplateSelector.retrieveAllItems for("
             + JSON.stringify(facilityContext.selectedFacility, ["id", "name"])
             + ")");
         FacilityClient.templateAll(

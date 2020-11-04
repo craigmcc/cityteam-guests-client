@@ -6,7 +6,7 @@ import Row from "react-bootstrap/Row";
 import DateSelector from "../library/components/DateSelector";
 import * as Dates from "../library/util/Dates";
 
-//import CheckinAssignedView from "./CheckinAssignedView";
+import CheckinAssignedView from "./CheckinAssignedView";
 import CheckinListView from "./CheckinListView";
 //import CheckinUnassignedView from "./CheckinUnassignedView";
 import { FacilityContext } from "../contexts/FacilityContext";
@@ -87,14 +87,12 @@ const CheckinView = () => {
                 </Row>
             </Container>
 
-{/*
             {(stage === "Assigned") ? (
                 <CheckinAssignedView
                     handleStage={handleStage}
                     registration={registration}
                 />
             ) : null}
-*/}
 
             {(stage === "List") ? (
                 <CheckinListView

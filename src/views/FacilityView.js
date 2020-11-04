@@ -11,7 +11,6 @@ import * as FacilityClient from "../clients/FacilityClient";
 import FacilityForm from "../forms/FacilityForm";
 import { reportError } from "../util/error.handling";
 import * as Replacers from "../util/Replacers";
-import TemplateForm from "../forms/TemplateForm";
 
 // FacilityView --------------------------------------------------------------
 
