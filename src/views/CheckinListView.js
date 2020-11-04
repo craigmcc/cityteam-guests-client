@@ -55,7 +55,10 @@ const CheckinListView = (props) => {
         console.info("CheckinListView.handleGenerate for ("
             + JSON.stringify(template, Replacers.TEMPLATE)
             + ")");
-        TemplateClient.generate(template.id, props.selectedDate)
+        TemplateClient.generate(
+            template.id,
+            props.selectedDate
+        )
             .then(response => {
                 let newRegistrations = flattenedRegistrations(response.data);
                 console.info("CheckinListView.handleGenerate got ("

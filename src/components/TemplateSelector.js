@@ -111,7 +111,7 @@ const TemplateSelector = (props) => {
             actionSize={props.actionSize ? props.actionSize : null}
             actionVariant={props.actionVariant ? props.actionVariant : "outline-primary"}
             autoFocus={props.autoFocus ? props.autoFocus : null}
-            elementClassName={props.elementClassName ? props.elemenClassName : null}
+            elementClassName={props.elementClassName ? props.elementClassName : null}
             fieldClassName={props.fieldClassName ? props.fieldClassName : "col-8"}
             fieldDisabled={props.fieldDisabled ? props.fieldDisabled : null}
             fieldName={props.fieldName ? props.fieldName : "selectedTemplate"}

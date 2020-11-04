@@ -85,13 +85,13 @@ const AssignForm = (props) => {
 
 // First two characters of each option are the value to be checked
     const validatePaymentTypes = [
-        "$$ - Cash",
-        "AG - Agency",
-        "CT - CityTeam",
-        "FM - Free Mat",
-        "MM - Medical Mat",
-        "SW - Severe Weather",
-        "UK - Unknown"
+        "$$-Cash",
+        "AG-Agency",
+        "CT-CityTeam",
+        "FM-Free Mat",
+        "MM-Medical Mat",
+        "SW-Severe Weather",
+        "UK-Unknown"
     ]
 
     return (
@@ -126,104 +126,91 @@ const AssignForm = (props) => {
                             validated={false}
                         >
 
-
-                            <Row>
-
-                                <Col className="col-7">
-
-                                    <SelectElement
-                                        autoFocus={props.autoFocus}
-                                        fieldClassName="col-7"
-                                        fieldName="paymentType"
-                                        fieldValue={values.paymentType}
-                                        label="Pay Type:"
-                                        labelClassName="col-5"
-                                        onBlur={handleBlur}
-                                        onChange={handleChange}
-                                        options={paymentOptions()}
-                                    />
-                                    <CommonError
-                                        errors={errors.paymentType}
-                                        touched={touched.paymentType}
-                                    />
-
-                                </Col>
-
-                                <Col className="col-5">
-
-                                    <TextElement
-                                        fieldClassName="col-6"
-                                        fieldName="paymentAmount"
-                                        fieldValue={values.paymentAmount}
-                                        label="Amount:"
-                                        labelClassName="col-6"
-                                        onBlur={handleBlur}
-                                        onChange={handleChange}
-                                    />
-                                    <CommonError
-                                        errors={errors.paymentAmount}
-                                        touched={touched.paymentAmount}
-                                    />
-
-                                </Col>
-
-                            </Row>
-
-                            <Row>
-
-                                <Col className="col-7">
-
-                                    <TextElement
-                                        fieldClassName="col-6"
-                                        fieldName="showerTime"
-                                        fieldValue={values.showerTime}
-                                        label="Shower:"
-                                        labelClassName="col-6"
-                                        onBlur={handleBlur}
-                                        onChange={handleChange}
-                                    />
-                                    <CommonError
-                                        errors={errors.showerAt}
-                                        touched={touched.showerAt}
-                                    />
-
-                                </Col>
-
-                                <Col className="col-5">
-
-                                    <TextElement
-                                        fieldClassName="col-6"
-                                        fieldName="wakeupTime"
-                                        fieldValue={values.wakeupTime}
-                                        label="Wakeup:"
-                                        labelClassName="col-6"
-                                        onBlur={handleBlur}
-                                        onChange={handleChange}
-                                    />
-                                    <CommonError
-                                        errors={errors.wakeupAt}
-                                        touched={touched.wakeupAt}
-                                    />
-
-                                </Col>
-
-                            </Row>
+                            <SelectElement
+                                autoFocus={props.autoFocus}
+                                fieldClassName="col-8"
+                                fieldName="paymentType"
+                                fieldValue={values.paymentType}
+                                label="Pay Type:"
+                                labelClassName="col-4"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                                options={paymentOptions()}
+                            />
+                            <CommonError
+                                errors={errors.paymentType}
+                                fieldClassName="col-8"
+                                labelClassName="col-4"
+                                touched={touched.paymentType}
+                            />
 
                             <TextElement
+                                fieldClassName="col-8"
+                                fieldName="paymentAmount"
+                                fieldValue={values.paymentAmount}
+                                label="Amount:"
+                                labelClassName="col-4"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                            />
+                            <CommonError
+                                errors={errors.paymentAmount}
+                                fieldClassName="col-8"
+                                labelClassName="col-4"
+                                touched={touched.paymentAmount}
+                            />
+
+                            <TextElement
+                                fieldClassName="col-8"
+                                fieldName="showerTime"
+                                fieldValue={values.showerTime}
+                                label="Shower At:"
+                                labelClassName="col-4"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                            />
+                            <CommonError
+                                errors={errors.showerTime}
+                                fieldClassName="col-8"
+                                labelClassName="col-4"
+                                touched={touched.showerTime}
+                            />
+
+                            <TextElement
+                                fieldClassName="col-8"
+                                fieldName="wakeupTime"
+                                fieldValue={values.wakeupTime}
+                                label="Wakeup At:"
+                                labelClassName="col-4"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                            />
+                            <CommonError
+                                errors={errors.wakeupTime}
+                                fieldClassName="col-8"
+                                labelClassName="col-4"
+                                touched={touched.wakeupTime}
+                            />
+
+                            <TextElement
+                                fieldClassName="col-8"
                                 fieldName="comments"
                                 fieldValue={values.comments}
                                 label="Comments:"
+                                labelClassName="col-4"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
                             />
                             <CommonError
                                 errors={errors.comments}
+                                fieldClassName="col-8"
+                                labelClassName="col-4"
                                 touched={touched.comments}
                             />
 
                             <Row className="mt-3">
-                                <Col className="col-3"/>
-                                <Col className="col-9">
+                                <Col className="col-4"/>
+                                <Col className="col-8">
                                     <SaveButton
                                         disabled={isSubmitting || !isValid}/>
                                 </Col>

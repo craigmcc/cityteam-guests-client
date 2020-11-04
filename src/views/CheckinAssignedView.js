@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
-//import Modal from "react-bootstrap/Modal";
+import Modal from "react-bootstrap/Modal";
 import Row from "react-bootstrap/Row";
 
 import ActionButton from "../library/components/ActionButton";
+import SelectElement from "../library/components/SelectElement";
 
+import * as FacilityClient from "../clients/FacilityClient";
 import * as RegistrationClient from "../clients/RegistrationClient";
 import AssignForm from "../forms/AssignForm";
 import { reportError } from "../util/error.handling";
@@ -61,7 +63,10 @@ const CheckinAssignedView = (props) => {
     }
 
     const handleAssign = (assigned) => {
-        RegistrationClient.assign(props.registration.id, assigned)
+        RegistrationClient.assign(
+            props.registration.id,
+            assigned
+        )
             .then(response => {
                 console.info("AssignForm.handleAssign("
                     + JSON.stringify(response.data, Replacers.REGISTRATION)
@@ -75,7 +80,119 @@ const CheckinAssignedView = (props) => {
 
     // For Option 2 ----------------------------------------------------------
 
+    const [availableId, setAvailableId] = useState(-1);
+    const [availables, setAvailables] = useState([]);
+
+    useEffect(() => {
+
+        const retrieveAvailableRegistrations = () => {
+            console.info("CheckinAssignedView.retrieveAvailableRegistrations() for("
+                + JSON.stringify(props.registration, Replacers.REGISTRATION)
+                + ")");
+            FacilityClient.registrationAvailable(
+                props.registration.facilityId,
+                props.registration.registrationDate
+            )
+                .then(response => {
+                    console.info("CheckinAssignedView.retrieveAvailableRegistrations got("
+                        + JSON.stringify(response.data, Replacers.REGISTRATION)
+                        + ")");
+                    setAvailableId(-1);
+                    setAvailables(flattenedRegistrations(response.data));
+                })
+                .catch(error => {
+                    reportError("CheckinAssignedView.retrieveAvailableRegistrations()", error);
+                    setAvailableId(-1);
+                    setAvailables([]);
+                })
+        }
+
+        console.info("CheckinAssignedView.useEffect()");
+        retrieveAvailableRegistrations();
+
+    }, [props.registration]);
+
+    const availableOptions = () => {
+        let results = [];
+        results.push({
+            description: "(Select)",
+            value: 0,
+        });
+        availables.forEach(choice => {
+            results.push({
+                description: choice.matNumberAndFeatures,
+                value: choice.id,
+            });
+        });
+        return results;
+    }
+
+    const flattenedRegistrations = (registrations) => {
+        let flattenedItems = registrations;
+        for (let flattenedItem of flattenedItems) {
+            flattenedItem.matNumberAndFeatures = "" + flattenedItem.matNumber;
+            if (flattenedItem.features) {
+                flattenedItem.matNumberAndFeatures += flattenedItem.features;
+            }
+        }
+        return flattenedItems;
+    }
+
+    const onAvailableChange = (event) => {
+        console.info("CheckinAssignedView.onAvailableChange("
+            + event.target.value
+            + ")");
+        setAvailableId(event.target.value);
+    }
+
+    const onReassign = () => {
+        console.info("CheckinAssignedView.onReassign("
+            + JSON.stringify(props.registration, Replacers.REGISTRATION)
+            + ", to=" + availableId
+            + ")");
+        RegistrationClient.reassign(
+            props.registration.id,
+            availableId
+        )
+            .then(response => {
+                setAvailableId(-1);
+                handleStage("List");
+            })
+            .catch(error => {
+                reportError("CheckAssignedView.onReassign()", error);
+            })
+    }
+
     // For Option 3 ----------------------------------------------------------
+
+    const [showDeassignConfirm, setShowDeassignConfirm] = useState(false);
+
+    const onDeassignConfirm = () => {
+        console.info("CheckinAssignedView.onDeassignConfirm()");
+        setShowDeassignConfirm(true);
+    }
+
+    const onDeassignConfirmNegative = () => {
+        console.info("CheckinAssignedView.onDeassignConfirmNegative()");
+        setShowDeassignConfirm(false);
+    }
+
+    const onDeassignConfirmPositive = () => {
+        console.info("CheckinAssignedView.onDeassignConfirmPositive("
+            + JSON.stringify(props.registration, Replacers.REGISTRATION)
+            + ")");
+        RegistrationClient.deassign(
+            props.registration.id
+        )
+            .then(response => {
+                setShowDeassignConfirm(false);
+                handleStage("List");
+            })
+            .catch(error => {
+                reportError
+                ("CheckinAssignedView.onDeassignConfirmPositive()", error);
+            })
+    }
 
     // Rendered Output -------------------------------------------------------
 
@@ -123,7 +240,7 @@ const CheckinAssignedView = (props) => {
 
                 {/* Option 1 --------------------------------------------- */}
 
-                <Col className="col-7 mb-1">
+                <Col className="col-5 mb-1">
                     <>
                         <h6>Option 1: Edit Assignment Details</h6>
                         <hr className="mb-3"/>
@@ -141,14 +258,108 @@ const CheckinAssignedView = (props) => {
 
                 {/* Option 2 --------------------------------------------- */}
 
-                <Col className="col-3 bg-light">
+                <Col className="col-4 bg-light">
+                    <>
+                        <h6>Option 2: Move Guest To A Different Mat</h6>
+                        <hr className="mb-3"/>
+                        <Row className="ml-2 mb-3">
+                            Move this Guest (and transfer the related assignment
+                            details) to a different mat.
+                        </Row>
+                        <Row className="ml-2 mb-3">
+                            <SelectElement
+                                fieldName="availableMat"
+                                fieldValue={availableId}
+                                label={"To Mat:"}
+                                onChange={onAvailableChange}
+                                options={availableOptions()}
+                            />
+                        </Row>
+                        <Row className="justify-content-center">
+                            <ActionButton
+                                disabled={availableId <= 0}
+                                label="Move"
+                                onClick={onReassign}
+                                size="sm"
+                                variant="info"
+                            />
+                        </Row>
+                    </>
                 </Col>
 
                 {/* Option 3 --------------------------------------------- */}
 
-                <Col className="col-2">
+                <Col className="col-3">
+                    <>
+                        <h6>Option 3: Remove Assignment</h6>
+                        <hr className="mb-3"/>
+                        <Row className="ml-2 mb-3">
+                            Remove the current assignment, erasing any
+                            of the details that were specified.
+                        </Row>
+                        <Row className="mb-5"/>
+                        <Row className="justify-content-end">
+                            <ActionButton
+                                label="Remove"
+                                onClick={onDeassignConfirm}
+                                variant="danger"
+                            />
+                        </Row>
+                    </>
                 </Col>
 
+            </Row>
+
+            {/* Option 3 Confirm Modal ----------------------------------- */}
+
+            <Modal
+                animation={false}
+                backdrop="static"
+                centered
+                onHide={onDeassignConfirmNegative}
+                show={showDeassignConfirm}
+                size="lg"
+            >
+
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirm Deassign</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>
+                        Do you really want to remove this assignment
+                        and erase the assignment details (including which
+                        Guest was assigned to this mat)?
+                    </p>
+                    <p>
+                        If you just want to move an assigned Guest to a
+                        different available mat, use Option 2 instead.
+                    </p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <ActionButton
+                        label="Confirm"
+                        onClick={onDeassignConfirmPositive}
+                        variant="danger"
+                    />
+                    <ActionButton
+                        label="Cancel"
+                        onClick={onDeassignConfirmNegative}
+                        variant="primary"
+                    />
+                </Modal.Footer>
+
+            </Modal>
+
+            {/* Common Footer -------------------------------------------- */}
+
+            <Row>
+                <Col className="col-11">
+                    <Row className="justify-content-center">
+                        Click&nbsp;<span className="text-primary">Back</span>&nbsp;
+                        to return the the list with no changes.
+                    </Row>
+                </Col>
+                <Col className="col-1"/>
             </Row>
 
         </Container>

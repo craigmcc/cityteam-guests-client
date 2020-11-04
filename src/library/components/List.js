@@ -89,6 +89,7 @@ const List = (props) => {
             bordered={props.bordered ? props.bordered : null}
             hover={props.hover ? props.hover : null}
             size={props.size ? props.size : "sm"}
+            striped={props.striped ? props.striped : null}
             variant={props.variant ? props.variant : null}
         >
 
