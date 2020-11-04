@@ -32,6 +32,7 @@ import * as Transformations from "../util/Transformations";
 // assign                   Assign containing initial values to display
 // autoFocus                Should we autoFocus on the first field?
 // handleAssign             Handle (assign) after it is saved [*REQUIRED*]
+// saveLabel                Label for the Save button [Save]
 
 // Component Details ---------------------------------------------------------
 
@@ -212,7 +213,9 @@ const AssignForm = (props) => {
                                 <Col className="col-4"/>
                                 <Col className="col-8">
                                     <SaveButton
-                                        disabled={isSubmitting || !isValid}/>
+                                        disabled={isSubmitting || !isValid}
+                                        label={props.saveLabel ? props.saveLabel : "Save"}
+                                    />
                                 </Col>
                             </Row>
 

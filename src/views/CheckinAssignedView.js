@@ -24,8 +24,8 @@ import * as Transformations from "../util/Transformations";
 
 // Incoming Properties -------------------------------------------------------
 
-// registration             Currently assigned Registration [*REQUIRED*]
 // handleStage              Handle (string) to request a different stage [*REQUIRED*]
+// registration             Currently assigned Registration [*REQUIRED*]
 
 // Component Details ---------------------------------------------------------
 
@@ -36,7 +36,7 @@ const CheckinAssignedView = (props) => {
     const handleStage = (newStage) => {
         console.info("CheckinAssignedView.handleStage(" + newStage + ")");
         if (props.handleStage) {
-            props.handleStage("List");
+            props.handleStage(newStage);
         } else {
             alert("CheckinAssignedView: Programming error, no handleStage defined, "
                 + "so no stage change is possible.");
@@ -68,7 +68,7 @@ const CheckinAssignedView = (props) => {
             assigned
         )
             .then(response => {
-                console.info("AssignForm.handleAssign("
+                console.info("CheckinAssignedView.handleAssign("
                     + JSON.stringify(response.data, Replacers.REGISTRATION)
                     + ")");
                 handleStage("List")

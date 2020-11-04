@@ -37,7 +37,9 @@ import * as Transformations from "../util/Transformations";
 // guest                    Guest containing initial values,
 //                          id<0 for adding [*REQUIRED*]
 // onConfirmNegative        Handle () on negative confirmation [no handler]
+// saveLabel                Label for Save button [Save]
 // withoutActive            Skip the active flag in the form? [false]
+// withoutRemove            Skip the remove button in the form? [false]
 
 // Component Details ---------------------------------------------------------
 
@@ -246,13 +248,17 @@ const GuestForm = (props) => {
                                 <Col className="col-3"/>
                                 <Col className="col-7">
                                     <SaveButton
-                                        disabled={isSubmitting || !isValid}/>
+                                        disabled={isSubmitting || !isValid}
+                                        label={props.saveLabel ? props.saveLabel : "Save"}
+                                    />
                                 </Col>
                                 <Col className="col-2 float-right">
-                                    <RemoveButton
-                                        disabled={adding}
-                                        onClick={onConfirm}
-                                    />
+                                    {!props.withoutRemove ? (
+                                        <RemoveButton
+                                            disabled={adding}
+                                            onClick={onConfirm}
+                                        />
+                                    ) : null }
                                 </Col>
                             </Row>
 

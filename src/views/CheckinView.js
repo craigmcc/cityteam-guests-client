@@ -8,7 +8,7 @@ import * as Dates from "../library/util/Dates";
 
 import CheckinAssignedView from "./CheckinAssignedView";
 import CheckinListView from "./CheckinListView";
-//import CheckinUnassignedView from "./CheckinUnassignedView";
+import CheckinUnassignedView from "./CheckinUnassignedView";
 import { FacilityContext } from "../contexts/FacilityContext";
 import * as Replacers from "../util/Replacers";
 
@@ -101,14 +101,12 @@ const CheckinView = () => {
                 />
             ) : null}
 
-{/*
             {(stage === "Unassigned") ? (
                 <CheckinUnassignedView
                     handleStage={handleStage}
                     registration={registration}
                 />
             ) : null}
-*/}
 
         </>
 
