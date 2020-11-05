@@ -16,6 +16,7 @@ import { reportError } from "../util/error.handling";
 import * as Replacers from "../util/Replacers";
 import * as RegistrationClient from "../clients/RegistrationClient";
 import ActionButton from "../library/components/ActionButton";
+import * as Transformations from "../util/Transformations";
 
 // CheckinUnassignedView -----------------------------------------------------
 
@@ -27,7 +28,8 @@ import ActionButton from "../library/components/ActionButton";
 // Incoming Properties -------------------------------------------------------
 
 // handleStage              Handle (string) to request a different stage [*REQUIRED*]
-// registration             Currently assigned Registration [*REQUIRED*]
+// registration             Currently unassigned Registration [*REQUIRED*]
+// selectedDate             Checkin date we are handling [*REQUIRED]
 
 // Component Details ---------------------------------------------------------
 
@@ -37,10 +39,6 @@ const CheckinUnassignedView = (props) => {
 
     const [assign, setAssign] = useState(null);
     const [guest, setGuest] = useState(null);
-
-    useEffect(() => {
-        console.info("CheckinUnassignedView.useEffect()");
-    }, [assign, guest]);
 
     const handleStage = (newStage) => {
         console.info("CheckinUnassignedView.handleStage(" + newStage + ")");
@@ -66,7 +64,13 @@ const CheckinUnassignedView = (props) => {
     const [guests, setGuests] = useState([]);
     const [index, setIndex] = useState(-1)
     const [pageSize] = useState(10);
+    const [registrations, setRegistrations] = useState([]);
     const [searchText, setSearchText] = useState("");
+
+    useEffect(() => {
+        console.info("CheckinUnassignedView.useEffect()");
+        retrieveRegistrations(props.selectedDate);
+    }, [FacilityContext.selectedFacility, props.selectedDate]);
 
     const emptyGuestValues = () => {
         return {
@@ -77,6 +81,18 @@ const CheckinUnassignedView = (props) => {
             firstName: "",
             lastName: "",
         }
+    }
+
+    const flattenedRegistrations = (registrations) => {
+        let flattenedItems =
+            Transformations.withFlattenedObjects(registrations, "guest");
+        for (let flattenedItem of flattenedItems) {
+            flattenedItem.matNumberAndFeatures = "" + flattenedItem.matNumber;
+            if (flattenedItem.features) {
+                flattenedItem.matNumberAndFeatures += flattenedItem.features;
+            }
+        }
+        return flattenedItems;
     }
 
     const handleAddSave = (newGuest) => {
@@ -105,14 +121,25 @@ const CheckinUnassignedView = (props) => {
             setGuest(null);
             setIndex(-1);
         } else {
-            // TODO: Verify this guest is not already assigned on this registrationDate
-            console.info("CheckinUnassignedView.handleIndex("
-                + newIndex + ", "
-                +JSON.stringify(guests[newIndex], Replacers.GUEST)
-                + ")");
-            configureAssign(guests[newIndex]);
-            setGuest(guests[newIndex]);
-            setIndex(newIndex);
+            let matNumber = -1;
+            registrations.forEach(check => {
+                if (check.guestId && (check.guestId === guests[newIndex].id)) {
+                    matNumber = check.matNumber;
+                }
+            })
+            if (matNumber >= 0) {
+                alert("This Guest is already assigned to mat " + matNumber
+                    + ".  Multiple assignments of the same Guest, "
+                    + " on the same date, are not allowed.")
+            } else {
+                console.info("CheckinUnassignedView.handleIndex("
+                    + newIndex + ", "
+                    +JSON.stringify(guests[newIndex], Replacers.GUEST)
+                    + ")");
+                configureAssign(guests[newIndex]);
+                setGuest(guests[newIndex]);
+                setIndex(newIndex);
+            }
         }
     }
 
@@ -187,6 +214,28 @@ const CheckinUnassignedView = (props) => {
             .catch(error => {
                 reportError("CheckinUnassignedView.retrieveGuests()", error);
             })
+    }
+
+    const retrieveRegistrations = (newSelectedDate) => {
+        if (facilityContext.selectedFacility.id <= 0) {
+            setRegistrations([]);
+            return;
+        }
+        FacilityClient.registrationDate(
+            facilityContext.selectedFacility.id,
+            newSelectedDate,
+            { withGuest: "" }
+        )
+            .then(response => {
+                let newRegistrations = flattenedRegistrations(response.data);
+                console.info("CheckinUnassignedView.retrieveRegistrations("
+                    + JSON.stringify(newRegistrations, Replacers.REGISTRATION)
+                    + ")");
+                setRegistrations(newRegistrations);
+            })
+            .catch(error => {
+                reportError("CheckinUnassignedView.retrieveRegistrations()", error);
+            });
     }
 
     // For Step 2 ------------------------------------------------------------
@@ -304,6 +353,7 @@ const CheckinUnassignedView = (props) => {
                             </Col>
                             <Col className="col-8">
                                 <SearchBar
+                                    autoFocus
                                     fieldClassName="col-12"
                                     fieldValue={searchText}
                                     onChange={onSearchChange}

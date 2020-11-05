@@ -13,6 +13,7 @@ import TextElement from "./TextElement";
 // action                   If withAction specified, button text [🔍]
 // actionClassName          If withAction specified, CSS styles for action <Col> [col-1]
 // actionVariant            If withAction specified, button variant [light]
+// autoFocus                Should this element receive autofocus? [false]
 // elementClassName         CSS styles for the entire <Row> [col-12]
 // fieldClassName           CSS styles for the input <Col> [col-11]
 // fieldName                ID and name for this input [search]
@@ -33,15 +34,6 @@ const SearchBar = (props) => {
             props.onChange(event);
         }
     }
-
-    /*
-        const onClear = () => {
-            console.info("SearchBar.onClear()");
-            if (props.onChange) {
-                props.onChange({target: { value: "" }});
-            }
-        }
-    */
 
     const onClick = () => {
         console.info("SearchBar.onClick()");
@@ -65,6 +57,7 @@ const SearchBar = (props) => {
             action={props.withAction ? (props.action ? props.action : "🔍") : null}
             actionClassName={props.actionClassName ? props.actionClassName : "col-1"}
             actionVariant={props.actionVariant ? props.actionVariant : "light"}
+            autoFocus={props.autoFocus ? props.autoFocus : null}
             elementClassName={props.elementClassName ? props.elementClassName : "col-12"}
             fieldClassName={props.fieldClassName ? props.fieldClassName : "col-11"}
             fieldName={props.fieldName ? props.fieldName : "search"}

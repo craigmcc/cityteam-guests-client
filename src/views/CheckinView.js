@@ -105,6 +105,7 @@ const CheckinView = () => {
                 <CheckinUnassignedView
                     handleStage={handleStage}
                     registration={registration}
+                    selectedDate={selectedDate}
                 />
             ) : null}
 
