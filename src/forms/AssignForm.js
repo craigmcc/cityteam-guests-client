@@ -22,9 +22,7 @@ import * as Transformations from "../util/Transformations";
 // TODO - move the actual database transaction back to the caller.
 
 // NOTES:
-// - handleAssign will only be called when all validations pass,
-//   and the database transaction has already occurred.  (This latter
-//   part might change in the future.)
+// - handleAssign will only be called when all validations pass.
 // - Parent component can abandon a form with no complications.
 
 // Incoming Properties -------------------------------------------------------
@@ -124,7 +122,7 @@ const AssignForm = (props) => {
                             className="mx-auto"
                             noValidate
                             onSubmit={handleSubmit}
-                            validated={false}
+                            validated="false"
                         >
 
                             <SelectElement

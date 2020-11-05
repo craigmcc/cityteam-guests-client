@@ -37,17 +37,10 @@ const CheckinUnassignedView = (props) => {
 
     const [assign, setAssign] = useState(null);
     const [guest, setGuest] = useState(null);
-    const [registration] = useState(props.registration);
 
     useEffect(() => {
         console.info("CheckinUnassignedView.useEffect()");
-/*
-        registration.matNumberAndFeatures = "" + registration.matNumber;
-        if (registration.features) {
-            registration.matNumberAndFeatures += registration.features;
-        }
-*/
-    }, [assign, guest, registration]);
+    }, [assign, guest]);
 
     const handleStage = (newStage) => {
         console.info("CheckinUnassignedView.handleStage(" + newStage + ")");
@@ -94,15 +87,33 @@ const CheckinUnassignedView = (props) => {
                     + JSON.stringify(response.data, Replacers.GUEST)
                     + ")");
                 setCurrentPage(1);
-                retrieveGuests(searchText, 1);
+//                retrieveGuests(searchText, 1);
                 setAdding(false);
-                setGuest(newGuest);
+                setGuest(response.data);
                 setIndex(-1);
-                configureAssign(newGuest);
+                configureAssign(response.data);
             })
             .catch(error => {
                 reportError("CheckinUnassignedView.handleAddSave()", error);
             })
+    }
+
+    const handleIndex = (newIndex) => {
+        if (newIndex === index) {
+            console.info("CheckinUnassignedView.handleIndex(-1)");
+            configureAssign(null);
+            setGuest(null);
+            setIndex(-1);
+        } else {
+            // TODO: Verify this guest is not already assigned on this registrationDate
+            console.info("CheckinUnassignedView.handleIndex("
+                + newIndex + ", "
+                +JSON.stringify(guests[newIndex], Replacers.GUEST)
+                + ")");
+            configureAssign(guests[newIndex]);
+            setGuest(guests[newIndex]);
+            setIndex(newIndex);
+        }
     }
 
     const listFields = [
@@ -121,7 +132,7 @@ const CheckinUnassignedView = (props) => {
 
     const onAddClick = () => {
         console.info("CheckinUnassignedView.onAddClick()");
-        setAdding(!adding);
+        setAdding(true);
         setCurrentPage(1);
         setGuest(null);
         setIndex(-1);
@@ -150,24 +161,6 @@ const CheckinUnassignedView = (props) => {
         retrieveGuests(event.target.value, currentPage);
     }
 
-    const handleIndex = (newIndex) => {
-        if (newIndex === index) {
-            console.info("CheckinUnassignedView.handleIndex(-1)");
-            configureAssign(null);
-            setGuest(null);
-            setIndex(-1);
-        } else {
-            // TODO: Verify this guest is not already assigned on this registrationDate
-            console.info("CheckinUnassignedView.handleIndex("
-                + newIndex + ", "
-                +JSON.stringify(guests[newIndex], Replacers.GUEST)
-                + ")");
-            configureAssign(guests[newIndex]);
-            setGuest(guests[newIndex]);
-            setIndex(newIndex);
-        }
-    }
-
     const retrieveGuests = (newSearchText, newCurrentPage) => {
         console.info("CheckinUnassignedView.retrieveGuests for("
             + newSearchText + ", "
@@ -177,7 +170,7 @@ const CheckinUnassignedView = (props) => {
             return;
         }
         FacilityClient.guestName(
-            registration.facilityId,
+            props.registration.facilityId,
             newSearchText,
             {
                 limit: pageSize,
@@ -199,13 +192,13 @@ const CheckinUnassignedView = (props) => {
     // For Step 2 ------------------------------------------------------------
 
     const configureAssign = (newGuest) => {
-        console.info("CheckinUnassignedView.extractAssign for("
-            + JSON.stringify(newGuest)
+        console.info("CheckinUnassignedView.configureAssign for("
+            + JSON.stringify(newGuest, Replacers.GUEST)
             + ")");
         let newAssign;
         if (newGuest) {
             newAssign = {
-                id: registration.id,
+                id: props.registration.id,
                 comments: null,
                 facilityId: newGuest.facilityId,
                 guestId: newGuest.id,
@@ -217,7 +210,7 @@ const CheckinUnassignedView = (props) => {
         } else {
             newAssign = null;
         }
-        console.info("CheckinUnassignedView.extractAssign got("
+        console.info("CheckinUnassignedView.configureAssign got("
             + JSON.stringify(newAssign, Replacers.REGISTRATION)
             + ")");
         setAssign(newAssign);
@@ -252,7 +245,7 @@ const CheckinUnassignedView = (props) => {
                             <Row className="justify-content-center">
                                 Mat Number:&nbsp;
                                 <span className="text-info">
-                                    {registration.matNumberAndFeatures}
+                                    {props.registration.matNumberAndFeatures}
                                     &nbsp;&nbsp;&nbsp;&nbsp;
                                 </span>
                                 { (guest) ? (
