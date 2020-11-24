@@ -12,6 +12,7 @@ export const registrationsFields = [
     "totalMM",
     "totalSW",
     "totalUK",
+    "totalWB",
     "totalAssigned",
     "percentAssigned",
     "totalUnassigned",
@@ -28,6 +29,7 @@ export const registrationsHeaders = [
     "MM",
     "SW",
     "UK",
+    "WB",
     "Used",
     "%Used",
     "Empty",
@@ -46,6 +48,7 @@ export const registrationsTotals = (registrations) => {
         totalMM: 0,
         totalSW: 0,
         totalUK: 0,
+        totalWB: 0,
         totalAssigned: 0,
         percentAssigned: 0.0,
         totalUnassigned: 0,
@@ -64,6 +67,7 @@ export const registrationsTotals = (registrations) => {
                 case "MM":  totals.totalMM++;   break;
                 case "SW":  totals.totalSW++;   break;
                 case "UK":  totals.totalUK++;   break;
+                case "WB":  totals.totalWB++;   break;
                 default:    totals.totalUK++;   break;
             }
             totals.totalAssigned++;
@@ -95,6 +99,7 @@ export const summariesFields = [
     "totalMM",
     "totalSW",
     "totalUK",
+    "totalWB",
     "totalAssigned",
     "percentAssigned",
     "totalUnassigned",
@@ -111,6 +116,7 @@ export const summariesHeaders = [
     "MM",
     "SW",
     "UK",
+    "WB",
     "Used",
     "%Used",
     "Empty",
@@ -129,6 +135,7 @@ export const summariesTotals = (summaries) => {
         totalMM: 0,
         totalSW: 0,
         totalUK: 0,
+        totalWB: 0,
         totalAssigned: 0,
         percentAssigned: 0.0,
         totalUnassigned: 0,
@@ -145,6 +152,7 @@ export const summariesTotals = (summaries) => {
         totals.totalMM += summary.totalMM;
         totals.totalSW += summary.totalSW;
         totals.totalUK += summary.totalUK;
+        totals.totalWB += summary.totalWB;
         totals.totalAssigned += summary.totalAssigned;
         totals.totalUnassigned += summary.totalUnassigned;
         totals.totalMats += (summary.totalAssigned + summary.totalUnassigned);

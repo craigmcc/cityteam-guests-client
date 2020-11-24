@@ -148,6 +148,7 @@ const CheckinUnassignedView = (props) => {
         "lastName",
         "active",
         "comments",
+        "favorite",
     ];
 
     const listHeaders = [
@@ -155,6 +156,7 @@ const CheckinUnassignedView = (props) => {
         "Last Name",
         "Active",
         "Comments",
+        "Fav. Mat",
     ];
 
     const onAddClick = () => {

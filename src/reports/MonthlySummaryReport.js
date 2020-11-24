@@ -68,12 +68,13 @@ const MonthlySummaryReport = () => {
         "totalMM",
         "totalSW",
         "totalUK",
+        "totalWB",
         "totalAssigned",
         "percentAssigned",
         "totalUnassigned",
         "percentUnassigned",
         "totalMats",
-        "totalAmount",
+        "totalAmountFormatted",
     ]);
     const [summariesHeaders] = useState([
         "Date",
@@ -84,6 +85,7 @@ const MonthlySummaryReport = () => {
         "MM",
         "SW",
         "UK",
+        "WB",
         "Used",
         "%Used",
         "Empty",
@@ -170,7 +172,7 @@ const MonthlySummaryReport = () => {
                         summary.percentUnassigned =
                             "" + (summary.totalUnassigned * 100 / summary.totalMats).toFixed(1) + "%";
                     }
-                    summary.totalAmount = "$" + parseFloat(summary.totalAmount).toFixed(2);
+                    summary.totalAmountFormatted = "$" + parseFloat(summary.totalAmount).toFixed(2);
                 })
                 setSummariesIndex(-1);
 //                    setSummariesItem(null);

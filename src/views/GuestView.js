@@ -119,6 +119,7 @@ const GuestView = () => {
         "lastName",
         "active",
         "comments",
+        "favorite",
     ]
 
     const listHeaders = [
@@ -126,6 +127,7 @@ const GuestView = () => {
         "Last Name",
         "Active",
         "Comments",
+        "Fav. Mat",
     ]
 
     const onAdd = () => {

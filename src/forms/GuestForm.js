@@ -244,6 +244,19 @@ const GuestForm = (props) => {
                                 touched={touched.comments}
                             />
 
+                            <TextElement
+                                fieldName="favorite"
+                                fieldValue={values.favorite}
+                                htmlSize={3}
+                                label="Favorite Mat:"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                            />
+                            <CommonError
+                                errors={errors.favorite}
+                                touched={touched.favorite}
+                            />
+
                             <Row className="mt-3">
                                 <Col className="col-3"/>
                                 <Col className="col-7">

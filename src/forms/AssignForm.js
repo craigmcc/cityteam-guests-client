@@ -90,7 +90,8 @@ const AssignForm = (props) => {
         "FM-Free Mat",
         "MM-Medical Mat",
         "SW-Severe Weather",
-        "UK-Unknown"
+        "UK-Unknown",
+        "WB-Work Bed",
     ]
 
     return (
