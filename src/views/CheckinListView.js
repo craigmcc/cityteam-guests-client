@@ -10,6 +10,7 @@ import * as TemplateClient from "../clients/TemplateClient";
 import TemplateSelector from "../components/TemplateSelector";
 import { FacilityContext } from "../contexts/FacilityContext";
 import * as Replacers from "../util/Replacers";
+import * as ReportTotals from "../util/ReportTotals";
 import * as Transformations from "../util/Transformations";
 import { reportError } from "../util/error.handling";
 
@@ -31,6 +32,8 @@ const CheckinListView = (props) => {
 
     const facilityContext = useContext(FacilityContext);
 
+    const [detailsTotals, setDetailsTotals] = useState({});
+    const [detailsTotalsTitle, setDetailsTotalsTitle] = useState("");
     const [index, setIndex] = useState(-1);
     const [registrations, setRegistrations] = useState([]);
 
@@ -131,6 +134,10 @@ const CheckinListView = (props) => {
                     + ")");
                 setIndex(-1);
                 setRegistrations(newRegistrations);
+                setDetailsTotals(ReportTotals.registrationsTotals(newRegistrations));
+                setDetailsTotalsTitle("In-Progress Totals for "
+                    + facilityContext.selectedFacility.name
+                    + " (" + newSelectedDate + ")");
             })
             .catch(error => {
                 reportError("CheckinListView.retrieveRegistrations()", error);
@@ -154,7 +161,7 @@ const CheckinListView = (props) => {
                 <span/>
             )}
 
-            <Row className="mb-3">
+            <Row className="ml-1 mr-1 mb-3">
                 <Col>
                     <List
                         bordered
@@ -170,7 +177,17 @@ const CheckinListView = (props) => {
                 </Col>
             </Row>
 
-            <Row className="mb-3 ml-1">
+            <Row className="ml-3 mr-3">
+                <List
+                    bordered
+                    fields={ReportTotals.registrationsFields}
+                    headers={ReportTotals.registrationsHeaders}
+                    items={[detailsTotals]}
+                    title={detailsTotalsTitle}
+                />
+            </Row>
+
+            <Row className="mb-3 ml-3 mr-3">
                 Click on a row to create a new assignment, or manage an existing
                 assignment, for that mat.
             </Row>
