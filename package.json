@@ -34,11 +34,8 @@
     "yup": "^0.29.3"
   },
   "scripts": {
-    "build-dev": "cross-env PUBLIC_URL=http://localhost:8081 react-scripts build",
-    "build-local": "react-scripts build",
-    "build-prod": "cross-env PUBLIC_URL=http://wildfly.hopto.org:8081 react-scripts build",
-    "start-dev": "cross-env PORT=8081 REACT_APP_NODE_ENV=development react-scripts start",
-    "start-prod": "cross-env PORT=8081 REACT_APP_NODE_ENV=production react-scripts start",
+    "build": "react-scripts build",
+    "start": "cross-env PORT=8081 react-scripts start",
     "test": "react-scripts test"
   },
   "eslintConfig": {
